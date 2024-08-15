@@ -1,18 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { RavendbService } from './raven/raven.service';
+import { LanguageEnum } from './dto/language.enum';
 
-type ProvidedQueryKey = {
-  [key: string]: string;
-};
 @Injectable()
 export class AppService {
   constructor(private readonly ravendbService: RavendbService) {}
-  async getTransfer(obj: ProvidedQueryKey) {
-    const key = Object.keys(obj)[0];
+  async search(lang: LanguageEnum, word: string) {
     const res = await this.ravendbService
       .session()
       .query({ collection: 'word' })
-      .search(key, obj[key])
+      .search(lang, `*${word}*`)
       .all();
     return res;
   }
