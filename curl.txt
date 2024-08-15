@@ -1,0 +1,1 @@
+curl -w "\n" -G --data-urlencode "ar=ماما" "localhost:3000"
