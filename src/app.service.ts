@@ -9,7 +9,7 @@ export class AppService {
     const res = await this.ravendbService
       .session()
       .query({ collection: 'word' })
-      .search(lang, `*${word}*`)
+      .search(`${lang}.Word`, `*${word}*`)
       .all();
     return res;
   }
