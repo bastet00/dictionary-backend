@@ -4,6 +4,7 @@ import { LanguageEnum } from './dto/language.enum';
 import { CreateWordDto } from './dto/input/create-word.dto';
 import { toUTF32Hex } from './util/utf32-transform';
 import * as crypto from 'crypto';
+import { Word } from './raven/entities/word.entity';
 @Injectable()
 export class AppService {
   constructor(private readonly ravendbService: RavendbService) {}
@@ -13,7 +14,16 @@ export class AppService {
       .query({ collection: 'word' })
       .search(`${lang}.Word`, `*${word}*`)
       .all();
-    return res;
+    return this.toDto(res as Word[]);
+  }
+  private toDto(res: Word[]): Word[] {
+    return res.map((word) => {
+      return {
+        id: word.id,
+        Arabic: word.Arabic,
+        Egyptian: word.Egyptian,
+      };
+    });
   }
   async create(payload: CreateWordDto) {
     const db = this.ravendbService.session();
