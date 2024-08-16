@@ -33,4 +33,9 @@ export class AppController {
   create(@Body() createWordDto: CreateWordDto) {
     return this.appService.create(createWordDto);
   }
+
+  @Post('bulk')
+  createBulk(@Body() createWordDto: CreateWordDto[]) {
+    return this.appService.createBulk(createWordDto);
+  }
 }

@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { RavendbService } from './raven/raven.service';
 import { LanguageEnum } from './dto/language.enum';
 import { CreateWordDto } from './dto/input/create-word.dto';
-import { toUTF32Hex } from './util/utf32Transform';
-
+import { toUTF32Hex } from './util/utf32-transform';
+import * as crypto from 'crypto';
 @Injectable()
 export class AppService {
   constructor(private readonly ravendbService: RavendbService) {}
@@ -17,9 +17,19 @@ export class AppService {
   }
   async create(payload: CreateWordDto) {
     const db = this.ravendbService.session();
-    payload.Egyptian[0].Unicode = toUTF32Hex(payload.Egyptian[0].Symbol);
-    await db.store({ ...payload, collection: 'word' });
+    await db.store(
+      { ...payload, '@metadata': { '@collection': 'word' } },
+      crypto.randomUUID(),
+      { documentType: 'word' },
+    );
     await db.saveChanges();
-    return 'doc created';
+  }
+
+  async createBulk(bulkPayload: CreateWordDto[]) {
+    await Promise.all(
+      bulkPayload.map((payload) => {
+        this.create(payload);
+      }),
+    );
   }
 }

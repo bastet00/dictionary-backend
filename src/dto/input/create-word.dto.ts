@@ -2,10 +2,12 @@ import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsNotEmpty,
+  IsNumberString,
   IsString,
   Length,
   ValidateNested,
 } from 'class-validator';
+import { toUTF32String } from '../transformer/to-unicode';
 
 class ArabicWordDto {
   /*  WARNING:
@@ -24,19 +26,18 @@ class EgyptianWordDto {
   @IsString()
   Word: string;
 
-  Unicode: string; // acceptable empty unicode for now
-
   @IsNotEmpty()
-  @IsString()
+  @IsNumberString()
+  @Length(8)
   @Transform(({ value }) => value.trim())
-  @Length(1, 2)
+  @Transform(toUTF32String)
   Symbol: string;
 }
 export class CreateWordDto {
   @IsNotEmpty()
   @IsArray()
   @Type(() => ArabicWordDto)
-  // @ValidateNested({ each: true })
+  @ValidateNested({ each: true })
   Arabic: ArabicWordDto[];
 
   @IsNotEmpty()
