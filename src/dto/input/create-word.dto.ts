@@ -1,5 +1,6 @@
 import { Transform, Type } from 'class-transformer';
 import {
+  ArrayMinSize,
   IsArray,
   IsNotEmpty,
   IsNumberString,
@@ -36,12 +37,14 @@ class EgyptianWordDto {
 export class CreateWordDto {
   @IsNotEmpty()
   @IsArray()
+  @ArrayMinSize(1)
   @Type(() => ArabicWordDto)
   @ValidateNested({ each: true })
   Arabic: ArabicWordDto[];
 
   @IsNotEmpty()
   @IsArray()
+  @ArrayMinSize(1)
   @Type(() => EgyptianWordDto)
   @ValidateNested({ each: true })
   Egyptian: EgyptianWordDto[];
