@@ -12,6 +12,11 @@ export class RavendbService {
       password: process.env.CERT_PASSWORD,
       type: 'pfx',
     });
+
+    // Specify the collection in the object otherwise the object crashed into @empty collection
+    this.store.conventions.findCollectionNameForObjectLiteral = (entity) =>
+      entity['collection'];
+
     this.store.initialize();
   }
 

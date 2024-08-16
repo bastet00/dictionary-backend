@@ -16,14 +16,7 @@ import { CreateWordDto } from './dto/input/create-word.dto';
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
-
-  @Post()
-  create(@Body() createWordDto: CreateWordDto) {
-    //TODO: missing functionality
-    return 'This action adds a new word';
-  }
   /**
-   *
    * @param word the word to be translated
    * @param language the language this word written in
    * @returns list of words that match the provided word
@@ -34,5 +27,10 @@ export class AppController {
     @Query('lang', new ParseEnumPipe(LanguageEnum)) language: LanguageEnum,
   ) {
     return this.appService.search(language, word);
+  }
+
+  @Post()
+  create(@Body() createWordDto: CreateWordDto) {
+    return this.appService.create(createWordDto);
   }
 }
