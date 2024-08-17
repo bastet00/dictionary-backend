@@ -1,2 +1,4 @@
 curl -w "\n" -G --data-urlencode "word=ماما" "localhost:3000?lang=Arabic"
-curl -w "\n" -X POST "localhost:3000" -H "Content-Type:application/json" -d '{"Arabic":["ماما" , "بابا", "Test1"], "Egyptian":[{"Word":"موت", "Symbol":"𓀸"}]}'
+curl -w "\n" -X POST "localhost:3000" -H "Content-Type:application/json" -d '{"Arabic":[{"Word":"ماما"}, {"Word":"تيته"}], "Egyptian":[{"Word":"موت", "Symbol":"𓀸"}]}'
+curl -w "\n" -X POST "localhost:3000/bulk" -H "Content-Type:application/json" -d '[{"Arabic":[{"Word":"ماما"}, {"Word":"تيته"}], "Egyptian":[{"Word":"موت", "Symbol":"𓀸"}]}, {"Arabic":[{"Word":"ماما"}, {"Word":"تيته"}], "Egyptian":[{"Word":"موت", "Symbol":"𓀸"}]}]'
+curl -w "\n" -X POST "localhost:3000/word-suggestion" -H "Content-Type:application/json" -d '{"Email":"foo@bar.com", "Language":"spanish", "Egyptian":[{"Word":"word", "Symbol":"Symbol"}, {"Word":"word2", "Symbol":"anthor symbol"}], "Translation":[{"Word":"teta"}, {"Word":"gedo"}]}'
