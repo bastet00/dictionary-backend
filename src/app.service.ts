@@ -28,7 +28,7 @@ export class AppService {
     });
   }
 
-  create(payload: object) {
+  create(payload: CreateWordDto) {
     this.ravendbService.saveToDb(payload, 'word');
   }
 
