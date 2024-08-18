@@ -11,7 +11,6 @@ import {
 import { AppService } from './app.service';
 import { LanguageEnum } from './dto/language.enum';
 import { CreateWordDto } from './dto/input/create-word.dto';
-import { CreateSuggetionDto } from './dto/input/suggest-word.dto';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller()
@@ -38,10 +37,5 @@ export class AppController {
   @Post('bulk')
   createBulk(@Body() createWordDto: CreateWordDto[]) {
     return this.appService.createBulk(createWordDto);
-  }
-
-  @Post('word-suggestion')
-  createUserWord(@Body() createSuggetionDto: CreateSuggetionDto) {
-    return this.appService.createUserWord(createSuggetionDto);
   }
 }

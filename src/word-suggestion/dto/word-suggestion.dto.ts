@@ -7,7 +7,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { EgyptianWordDto } from './create-word.dto';
+import { EgyptianWordDto } from 'src/dto/input/create-word.dto';
 import { Type } from 'class-transformer';
 
 class TranslationDto {

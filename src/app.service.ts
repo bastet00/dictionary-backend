@@ -3,7 +3,6 @@ import { RavendbService } from './raven/raven.service';
 import { LanguageEnum } from './dto/language.enum';
 import { CreateWordDto } from './dto/input/create-word.dto';
 import { Word } from './raven/entities/word.entity';
-import { CreateSuggetionDto } from './dto/input/suggest-word.dto';
 
 @Injectable()
 export class AppService {
@@ -38,9 +37,5 @@ export class AppService {
         this.ravendbService.saveToDb(payload, 'word');
       }),
     );
-  }
-
-  createUserWord(payload: CreateSuggetionDto) {
-    this.ravendbService.saveToDb(payload, 'suggestion');
   }
 }
