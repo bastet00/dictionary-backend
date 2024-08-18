@@ -11,18 +11,12 @@ import {
 import { toUTF32String } from '../transformer/to-unicode';
 
 class ArabicWordDto {
-  /*  WARNING:
-   * sending post request overwrites the key make the server only recives the last pair
-   *
-   * NOTE:
-   * dealing with Arabic as string[] until figure out final scheme
-   */
   @IsNotEmpty()
   @IsString()
   Word: string;
 }
 
-class EgyptianWordDto {
+export class EgyptianWordDto {
   @IsNotEmpty()
   @IsString()
   Word: string;

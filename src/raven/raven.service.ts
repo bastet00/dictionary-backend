@@ -13,15 +13,23 @@ export class RavendbService {
       type: 'pfx',
     });
 
-    // Specify the collection in the object otherwise the object crashed into @empty collection
-    this.store.conventions.findCollectionNameForObjectLiteral = (entity) =>
-      entity['collection'];
-
     this.store.initialize();
   }
 
   session() {
     const session = this.store.openSession();
     return session;
+  }
+
+  async saveToDb(payload: object, docName: string) {
+    const db = this.session();
+
+    await db.store(
+      { ...payload, '@metadata': { '@collection': docName } },
+      crypto.randomUUID(),
+      { documentType: docName },
+    );
+
+    await db.saveChanges();
   }
 }
