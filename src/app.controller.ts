@@ -16,12 +16,22 @@ import { CreateWordDto } from './dto/input/create-word.dto';
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
+
+  /**
+   * Health check endpoint
+   * @returns Hello World
+   */
+  @Get()
+  helloWorld() {
+    return 'Hello World';
+  }
+
   /**
    * @param word the word to be translated
    * @param language the language this word written in
    * @returns list of words that match the provided word
    */
-  @Get()
+  @Get('search')
   search(
     @Query('word') word: string,
     @Query('lang', new ParseEnumPipe(LanguageEnum)) language: LanguageEnum,

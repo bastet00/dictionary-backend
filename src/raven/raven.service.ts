@@ -8,9 +8,11 @@ export class RavendbService {
 
   constructor() {
     this.store = new DocumentStore(process.env.DB_URL, 'words', {
-      certificate: fs.readFileSync(process.env.CERT_PATH),
+      certificate: process.env.CERTIFICATE
+        ? process.env.CERTIFICATE
+        : fs.readFileSync(process.env.CERT_PATH),
       password: process.env.CERT_PASSWORD,
-      type: 'pfx',
+      type: process.env.CERTIFICATE ? 'pem' : 'pfx',
     });
 
     this.store.initialize();
