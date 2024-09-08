@@ -5,6 +5,7 @@ import {
   IsArray,
   IsNotEmpty,
   IsNumberString,
+  IsOptional,
   IsString,
   Length,
   MaxLength,
@@ -48,7 +49,7 @@ export class CreateWordDto {
   @ValidateNested({ each: true })
   Arabic: WordDto[];
 
-  // @IsNotEmpty()
+  @IsOptional()
   @IsArray()
   @ArrayMinSize(1)
   @Type(() => WordDto)
