@@ -48,7 +48,7 @@ export class CreateWordDto {
   @ValidateNested({ each: true })
   Arabic: WordDto[];
 
-  @IsNotEmpty()
+  // @IsNotEmpty()
   @IsArray()
   @ArrayMinSize(1)
   @Type(() => WordDto)
