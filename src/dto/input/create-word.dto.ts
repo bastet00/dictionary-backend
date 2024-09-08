@@ -4,7 +4,6 @@ import {
   ArrayMinSize,
   IsArray,
   IsNotEmpty,
-  IsNumberString,
   IsOptional,
   IsString,
   Length,
@@ -35,7 +34,6 @@ export class EgyptianWordDto {
   Hieroglyphics: string[];
 
   @IsNotEmpty()
-  @IsNumberString()
   @Length(8)
   @Transform(({ value }) => value.trim())
   @Transform(toUTF32String)
@@ -62,4 +60,12 @@ export class CreateWordDto {
   @Type(() => EgyptianWordDto)
   @ValidateNested({ each: true })
   Egyptian: EgyptianWordDto[];
+}
+
+export class BulkCreateWordDto {
+  @IsArray()
+  @ArrayMinSize(1)
+  @Type(() => CreateWordDto)
+  @ValidateNested({ each: true })
+  words: CreateWordDto[];
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { RavendbService } from './raven/raven.service';
 import { LanguageEnum } from './dto/language.enum';
-import { CreateWordDto } from './dto/input/create-word.dto';
+import { BulkCreateWordDto, CreateWordDto } from './dto/input/create-word.dto';
 import { Word } from './raven/entities/word.entity';
 
 @Injectable()
@@ -9,12 +9,22 @@ export class AppService {
   constructor(private readonly ravendbService: RavendbService) {}
 
   async search(lang: LanguageEnum, word: string) {
-    const res = await this.ravendbService
+    const resExactMatch = await this.ravendbService
+      .session()
+      .query({ collection: 'word' })
+      .whereEquals(`${lang}.Word`, word)
+      .take(10)
+      .all();
+    if (resExactMatch.length != 0) {
+      return this.toDto(resExactMatch as Word[]);
+    }
+    const resFullTextSearch = await this.ravendbService
       .session()
       .query({ collection: 'word' })
       .search(`${lang}.Word`, `*${word}*`)
+      .take(10)
       .all();
-    return this.toDto(res as Word[]);
+    return this.toDto(resFullTextSearch as Word[]);
   }
 
   private toDto(res: Word[]): Word[] {
@@ -32,9 +42,9 @@ export class AppService {
     this.ravendbService.saveToDb(payload, 'word');
   }
 
-  async createBulk(bulkPayload: CreateWordDto[]) {
+  async createBulk(bulkPayload: BulkCreateWordDto) {
     await Promise.all(
-      bulkPayload.map((payload) => {
+      bulkPayload.words.map((payload) => {
         this.ravendbService.saveToDb(payload, 'word');
       }),
     );

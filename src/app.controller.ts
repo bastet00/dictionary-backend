@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { LanguageEnum } from './dto/language.enum';
-import { CreateWordDto } from './dto/input/create-word.dto';
+import { BulkCreateWordDto, CreateWordDto } from './dto/input/create-word.dto';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller()
@@ -45,7 +45,7 @@ export class AppController {
   }
 
   @Post('bulk')
-  createBulk(@Body() createWordDto: CreateWordDto[]) {
+  createBulk(@Body() createWordDto: BulkCreateWordDto) {
     return this.appService.createBulk(createWordDto);
   }
 }
