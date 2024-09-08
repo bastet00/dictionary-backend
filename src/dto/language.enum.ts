@@ -4,4 +4,5 @@
 export enum LanguageEnum {
   Arabic = 'Arabic',
   Egyptian = 'Egyptian',
+  English = 'English',
 }

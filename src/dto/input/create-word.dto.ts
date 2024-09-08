@@ -1,16 +1,18 @@
 import { Transform, Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
   ArrayMinSize,
   IsArray,
   IsNotEmpty,
   IsNumberString,
   IsString,
   Length,
+  MaxLength,
   ValidateNested,
 } from 'class-validator';
 import { toUTF32String } from '../transformer/to-unicode';
 
-class ArabicWordDto {
+class WordDto {
   @IsNotEmpty()
   @IsString()
   Word: string;
@@ -19,7 +21,17 @@ class ArabicWordDto {
 export class EgyptianWordDto {
   @IsNotEmpty()
   @IsString()
+  @MaxLength(500)
   Word: string;
+
+  @IsString()
+  @MaxLength(500)
+  Transliteration: string;
+
+  @IsArray()
+  @ArrayMaxSize(40)
+  @IsString({ each: true })
+  Hieroglyphics: string[];
 
   @IsNotEmpty()
   @IsNumberString()
@@ -32,9 +44,16 @@ export class CreateWordDto {
   @IsNotEmpty()
   @IsArray()
   @ArrayMinSize(1)
-  @Type(() => ArabicWordDto)
+  @Type(() => WordDto)
   @ValidateNested({ each: true })
-  Arabic: ArabicWordDto[];
+  Arabic: WordDto[];
+
+  @IsNotEmpty()
+  @IsArray()
+  @ArrayMinSize(1)
+  @Type(() => WordDto)
+  @ValidateNested({ each: true })
+  English: WordDto[];
 
   @IsNotEmpty()
   @IsArray()

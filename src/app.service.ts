@@ -23,6 +23,7 @@ export class AppService {
         id: word.id,
         Arabic: word.Arabic,
         Egyptian: word.Egyptian,
+        English: word.English,
       };
     });
   }
