@@ -12,7 +12,7 @@ import {
 } from 'class-validator';
 import { toUTF32String } from '../transformer/to-unicode';
 
-class WordDto {
+export class WordDto {
   @IsNotEmpty()
   @IsString()
   Word: string;
