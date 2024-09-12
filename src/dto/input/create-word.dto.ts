@@ -12,7 +12,7 @@ import {
 } from 'class-validator';
 import { toUTF32String } from '../transformer/to-unicode';
 
-class WordDto {
+export class WordDto {
   @IsNotEmpty()
   @IsString()
   Word: string;
@@ -25,10 +25,12 @@ export class EgyptianWordDto {
   Word: string;
 
   @IsString()
+  @IsOptional()
   @MaxLength(500)
   Transliteration: string;
 
   @IsArray()
+  @IsOptional()
   @ArrayMaxSize(40)
   @IsString({ each: true })
   Hieroglyphics: string[];
