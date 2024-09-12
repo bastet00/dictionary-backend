@@ -6,7 +6,7 @@ export class LoginController {
   constructor(private readonly loginService: LoginService) {}
 
   @Get()
-  login(@Query('password') pass: string) {
+  check(@Query('password') pass: string) {
     return this.loginService.check(pass);
   }
 }

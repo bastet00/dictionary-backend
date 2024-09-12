@@ -3,12 +3,12 @@ import {
   IsArray,
   IsNotEmpty,
   IsString,
-  Length,
+  MinLength,
   ValidateNested,
 } from 'class-validator';
+import { WordDto } from './create-word.dto';
 import { Transform, Type } from 'class-transformer';
 import { toUTF32String } from '../transformer/to-unicode';
-import { WordDto } from './create-word.dto';
 
 class EgyptianWord {
   @IsString()
@@ -16,7 +16,7 @@ class EgyptianWord {
   Word: string;
 
   @IsNotEmpty()
-  @Length(8)
+  @MinLength(8)
   @Transform(({ value }) => value.trim())
   @Transform(toUTF32String)
   Symbol: string;

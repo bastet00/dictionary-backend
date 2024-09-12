@@ -16,7 +16,7 @@ import {
 import { AppService } from './app.service';
 import { LanguageEnum } from './dto/language.enum';
 import { BulkCreateWordDto, CreateWordDto } from './dto/input/create-word.dto';
-import { LoginGuard } from './login.guard';
+import { LoginGuard } from './common/guards/login.guard';
 import { UpdateWordDto } from './dto/input/update-word.dto';
 
 @UseInterceptors(ClassSerializerInterceptor)
@@ -58,6 +58,7 @@ export class AppController {
 
   @Delete(':id')
   @UseGuards(LoginGuard)
+  @HttpCode(204)
   delete(@Param('id') id: string) {
     return this.appService.delete(id);
   }
