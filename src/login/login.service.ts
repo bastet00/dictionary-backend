@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class LoginService {
   check(pass: string) {
-    return true ? pass === process.env.ACCESS_KEY : false;
+    if (pass == process.env.ACCESS_KEY) {
+      return true;
+    }
+    throw new BadRequestException();
   }
 }
