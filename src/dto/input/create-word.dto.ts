@@ -25,10 +25,12 @@ export class EgyptianWordDto {
   Word: string;
 
   @IsString()
+  @IsOptional()
   @MaxLength(500)
   Transliteration: string;
 
   @IsArray()
+  @IsOptional()
   @ArrayMaxSize(40)
   @IsString({ each: true })
   Hieroglyphics: string[];
