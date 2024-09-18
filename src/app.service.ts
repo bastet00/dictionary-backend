@@ -64,6 +64,7 @@ export class AppService {
     doc.Egyptian[0].Word = updateWordDto.Egyptian[0].Word;
     doc.Egyptian[0].Symbol = updateWordDto.Egyptian[0].Symbol;
     doc.Arabic = updateWordDto.Arabic;
+    doc.English = updateWordDto.English ? updateWordDto.English : doc.English;
     await session.saveChanges();
     return doc;
   }
