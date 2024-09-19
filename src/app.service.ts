@@ -10,20 +10,11 @@ export class AppService {
   constructor(private readonly ravendbService: RavendbService) {}
 
   async search(lang: LanguageEnum, word: string) {
-    const resExactMatch = await this.ravendbService
-      .session()
-      .query({ collection: 'word' })
-      .whereEquals(`${lang}.Word`, word)
-      .take(10)
-      .all();
-    if (resExactMatch.length != 0) {
-      return this.toDto(resExactMatch as Word[]);
-    }
     const resFullTextSearch = await this.ravendbService
       .session()
       .query({ collection: 'word' })
       .search(`${lang}.Word`, `*${word}*`)
-      .take(10)
+      .take(20)
       .all();
     return this.toDto(resFullTextSearch as Word[]);
   }
