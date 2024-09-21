@@ -16,7 +16,7 @@ class TranslationDto {
   Word: string;
 }
 
-export class CreateSuggetionDto {
+export class CreateSuggestionDto {
   @IsOptional()
   @IsEmail()
   Email: string;
@@ -25,12 +25,17 @@ export class CreateSuggetionDto {
   @IsString()
   Language: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsArray()
-  @ArrayMinSize(1)
   @Type(() => TranslationDto)
   @ValidateNested({ each: true })
-  Translation: TranslationDto[];
+  Arabic: TranslationDto[];
+
+  @IsOptional()
+  @IsArray()
+  @Type(() => TranslationDto)
+  @ValidateNested({ each: true })
+  English: TranslationDto[];
 
   @IsNotEmpty()
   @IsArray()
