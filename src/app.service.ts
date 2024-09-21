@@ -10,10 +10,11 @@ export class AppService {
   constructor(private readonly ravendbService: RavendbService) {}
 
   async search(lang: LanguageEnum, word: string) {
+    const regSearch = word.replace(/ا/g, '[اأإ]');
     const resFullTextSearch = await this.ravendbService
       .session()
       .query({ collection: 'word' })
-      .search(`${lang}.Word`, `*${word}*`)
+      .whereRegex(`${lang}.Word`, `.*${regSearch}.*`)
       .take(20)
       .all();
     return this.toDto(resFullTextSearch as Word[]);
