@@ -21,10 +21,6 @@ export class CreateSuggestionDto {
   @IsEmail()
   Email: string;
 
-  @IsNotEmpty()
-  @IsString()
-  Language: string;
-
   @IsOptional()
   @IsArray()
   @Type(() => TranslationDto)
