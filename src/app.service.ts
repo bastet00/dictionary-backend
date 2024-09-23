@@ -9,13 +9,27 @@ import { UpdateWordDto } from './dto/input/update-word.dto';
 export class AppService {
   constructor(private readonly ravendbService: RavendbService) {}
 
+  private applyRegex(word: string) {
+    let wordReg = word.replace(/ا/g, '[اأإ]');
+    if (word.length <= 2) {
+      wordReg = `\\b${wordReg}\\b`;
+    }
+    return wordReg;
+  }
+
   async search(lang: LanguageEnum, word: string) {
-    const regSearch = word.replace(/ا/g, '[اأإ]');
-    const resFullTextSearch = await this.ravendbService
-      .session()
+    const regSearch = this.applyRegex(word);
+    const session = this.ravendbService.session();
+    const resFullTextSearch = await session
       .query({ collection: 'word' })
+      .openSubclause()
+      .whereRegex(`${lang}.Word`, `^${regSearch}$`)
+      .closeSubclause()
+      .orElse()
+      .openSubclause()
       .whereRegex(`${lang}.Word`, `.*${regSearch}.*`)
-      .take(20)
+      .closeSubclause()
+      .take(10)
       .all();
     return this.toDto(resFullTextSearch as Word[]);
   }
