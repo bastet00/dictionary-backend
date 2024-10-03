@@ -36,7 +36,7 @@ export class AdminService {
       count: total,
       totalPages: totalPages,
       page: page,
-      per_page: maxPerPage,
+      perPage: maxPerPage,
       items: res,
     };
   }
