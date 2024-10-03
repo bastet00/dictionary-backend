@@ -14,7 +14,7 @@ import { AdminWordService } from './admin.word.service';
 import { LanguageEnum } from 'src/dto/language.enum';
 import { LoginGuard } from 'src/common/guards/login.guard';
 import { UpdateWordDto } from 'src/dto/input/update-word.dto';
-import { NumericalDefault } from 'src/common/custom-pipes/defaultNumericalPipe';
+import { DefaultMinMaxValue } from 'src/common/custom-decorators/NumericalOrDefault';
 
 @Controller('admin')
 export class AdminWordController {
@@ -23,9 +23,8 @@ export class AdminWordController {
   @Get()
   @UseGuards(LoginGuard)
   search(
-    @Query('page', new NumericalDefault({ min: false, default: 1 }))
-    page: number,
-    @Query('per_page', new NumericalDefault({ min: true, default: 100 }))
+    @DefaultMinMaxValue({ key: 'page', default: 1, min: false }) page: number,
+    @DefaultMinMaxValue({ key: 'per_page', default: 100, min: true })
     perPage: number,
     @Query('word') word: string,
     @Query(
