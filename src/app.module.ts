@@ -6,6 +6,7 @@ import { RavendbService } from './raven/raven.service';
 import { WordSuggestionModule } from './word-suggestion/word-suggestion.module';
 import { LoginModule } from './login/login.module';
 import { PrivacyPolicyModule } from './privacy-policy/privacy-policy.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { PrivacyPolicyModule } from './privacy-policy/privacy-policy.module';
     WordSuggestionModule,
     LoginModule,
     PrivacyPolicyModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService, RavendbService],
