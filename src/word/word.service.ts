@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { RavendbService } from './raven/raven.service';
-import { LanguageEnum } from './dto/language.enum';
-import { BulkCreateWordDto, CreateWordDto } from './dto/input/create-word.dto';
-import { Word } from './raven/entities/word.entity';
+import { RavendbService } from '../raven/raven.service';
+import { LanguageEnum } from '../dto/language.enum';
+import { BulkCreateWordDto, CreateWordDto } from '../dto/input/create-word.dto';
+import { Word } from '../raven/entities/word.entity';
 
 @Injectable()
-export class AppService {
+export class WordService {
   constructor(private readonly ravendbService: RavendbService) {}
 
   private applyRegex(word: string) {
@@ -37,9 +37,9 @@ export class AppService {
     return res.map((word) => {
       return {
         id: word.id,
-        Arabic: word.Arabic,
-        Egyptian: word.Egyptian,
-        English: word.English,
+        arabic: word.arabic,
+        egyptian: word.egyptian,
+        english: word.english,
       };
     });
   }

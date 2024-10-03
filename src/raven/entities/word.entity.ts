@@ -1,11 +1,11 @@
 export interface Word {
   id: string;
-  Arabic: { Word: string }[];
-  Egyptian: {
-    Word: string;
-    Unicode: string;
-    Transliteration: string;
-    Hieroglyphics: string[];
+  arabic: { word: string }[];
+  egyptian: {
+    word: string;
+    unicode: string;
+    transliteration: string;
+    hieroglyphics: string[];
   }[];
-  English: { Word: string }[];
+  english: { word: string }[];
 }

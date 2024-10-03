@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { RavendbService } from './raven/raven.service';
 import { WordSuggestionModule } from './word-suggestion/word-suggestion.module';
 import { LoginModule } from './login/login.module';
 import { PrivacyPolicyModule } from './privacy-policy/privacy-policy.module';
 import { AdminModule } from './admin/admin.module';
+import { WordModule } from './word/word.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -15,8 +15,9 @@ import { AdminModule } from './admin/admin.module';
     LoginModule,
     PrivacyPolicyModule,
     AdminModule,
+    WordModule,
   ],
+  providers: [RavendbService],
   controllers: [AppController],
-  providers: [AppService, RavendbService],
 })
 export class AppModule {}

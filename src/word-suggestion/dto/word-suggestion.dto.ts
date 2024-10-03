@@ -13,30 +13,30 @@ import { Type } from 'class-transformer';
 class TranslationDto {
   @IsString()
   @IsNotEmpty()
-  Word: string;
+  word: string;
 }
 
 export class CreateSuggestionDto {
   @IsOptional()
   @IsEmail()
-  Email: string;
+  email: string;
 
   @IsOptional()
   @IsArray()
   @Type(() => TranslationDto)
   @ValidateNested({ each: true })
-  Arabic: TranslationDto[];
+  arabic: TranslationDto[];
 
   @IsOptional()
   @IsArray()
   @Type(() => TranslationDto)
   @ValidateNested({ each: true })
-  English: TranslationDto[];
+  english: TranslationDto[];
 
   @IsNotEmpty()
   @IsArray()
   @ArrayMinSize(1)
   @Type(() => EgyptianWordDto)
   @ValidateNested({ each: true })
-  Egyptian: EgyptianWordDto[];
+  egyptian: EgyptianWordDto[];
 }

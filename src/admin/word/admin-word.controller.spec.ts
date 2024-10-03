@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AdminWordController } from './admin.word.controller';
-import { AdminWordService } from './admin.word.service';
+import { AdminWordController } from './admin-word.controller';
+import { AdminWordService } from './admin-word.service';
 
 describe('AdminWordController', () => {
   let controller: AdminWordController;

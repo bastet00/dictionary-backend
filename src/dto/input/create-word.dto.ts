@@ -15,31 +15,31 @@ import { toUTF32String } from '../transformer/to-unicode';
 export class WordDto {
   @IsNotEmpty()
   @IsString()
-  Word: string;
+  word: string;
 }
 
 export class EgyptianWordDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(500)
-  Word: string;
+  word: string;
 
   @IsString()
   @IsOptional()
   @MaxLength(500)
-  Transliteration: string;
+  transliteration: string;
 
   @IsArray()
   @IsOptional()
   @ArrayMaxSize(40)
   @IsString({ each: true })
-  Hieroglyphics: string[];
+  hieroglyphics: string[];
 
   @IsNotEmpty()
   @Length(8)
   @Transform(({ value }) => value.trim())
   @Transform(toUTF32String)
-  Symbol: string;
+  symbol: string;
 }
 export class CreateWordDto {
   @IsNotEmpty()
@@ -47,21 +47,21 @@ export class CreateWordDto {
   @ArrayMinSize(1)
   @Type(() => WordDto)
   @ValidateNested({ each: true })
-  Arabic: WordDto[];
+  arabic: WordDto[];
 
   @IsOptional()
   @IsArray()
   @ArrayMinSize(1)
   @Type(() => WordDto)
   @ValidateNested({ each: true })
-  English: WordDto[];
+  english: WordDto[];
 
   @IsNotEmpty()
   @IsArray()
   @ArrayMinSize(1)
   @Type(() => EgyptianWordDto)
   @ValidateNested({ each: true })
-  Egyptian: EgyptianWordDto[];
+  egyptian: EgyptianWordDto[];
 }
 
 export class BulkCreateWordDto {

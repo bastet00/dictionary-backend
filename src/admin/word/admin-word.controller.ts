@@ -10,13 +10,13 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AdminWordService } from './admin.word.service';
+import { AdminWordService } from './admin-word.service';
 import { LanguageEnum } from 'src/dto/language.enum';
 import { LoginGuard } from 'src/common/guards/login.guard';
 import { UpdateWordDto } from 'src/dto/input/update-word.dto';
 import { DefaultMinMaxValue } from 'src/common/custom-decorators/NumericalOrDefault';
 
-@Controller('admin')
+@Controller('admin/word')
 export class AdminWordController {
   constructor(private readonly adminService: AdminWordService) {}
 

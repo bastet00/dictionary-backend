@@ -14,7 +14,7 @@ export class AdminWordService {
       .session()
       .query({ collection: 'word' })
       .skip(skip)
-      .whereRegex(`${lang}.Word`, `\\b${reg}.*`);
+      .whereRegex(`${lang}.word`, `\\b${reg}.*`);
   }
 
   async search(page: number, perPage: number, word: string, lang: string) {
@@ -22,7 +22,7 @@ export class AdminWordService {
     const total = await this.query(skip, lang, word).count();
     const totalPages = Math.ceil(total / perPage);
     const res = await this.query(skip, lang, word)
-      .selectFields(['id', 'Arabic', 'English', 'Egyptian'])
+      .selectFields(['id', 'arabic', 'english', 'egyptian'])
       .take(perPage)
       .all();
 
@@ -44,10 +44,10 @@ export class AdminWordService {
   async patch(id: string, updateWordDto: UpdateWordDto) {
     const session = this.ravendbService.session();
     const doc = (await session.load(id)) as CreateWordDto;
-    doc.Egyptian[0].Word = updateWordDto.Egyptian[0].Word;
-    doc.Egyptian[0].Symbol = updateWordDto.Egyptian[0].Symbol;
-    doc.Arabic = updateWordDto.Arabic;
-    doc.English = updateWordDto.English ? updateWordDto.English : doc.English;
+    doc.egyptian[0].word = updateWordDto.egyptian[0].word;
+    doc.egyptian[0].symbol = updateWordDto.egyptian[0].symbol;
+    doc.arabic = updateWordDto.arabic;
+    doc.english = updateWordDto.english ? updateWordDto.english : doc.english;
     await session.saveChanges();
     return doc;
   }
