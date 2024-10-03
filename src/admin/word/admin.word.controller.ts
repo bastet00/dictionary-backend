@@ -10,20 +10,23 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AdminService } from './admin.service';
+import { AdminWordService } from './admin.word.service';
 import { LanguageEnum } from 'src/dto/language.enum';
 import { LoginGuard } from 'src/common/guards/login.guard';
 import { UpdateWordDto } from 'src/dto/input/update-word.dto';
+import { NumericalDefault } from 'src/common/custom-pipes/defaultNumericalPipe';
 
 @Controller('admin')
-export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+export class AdminWordController {
+  constructor(private readonly adminService: AdminWordService) {}
 
   @Get()
   @UseGuards(LoginGuard)
   search(
-    @Query('page') page: string = '1',
-    @Query('per_page') perPage: string = '100',
+    @Query('page', new NumericalDefault({ min: false, default: 1 }))
+    page: number,
+    @Query('per_page', new NumericalDefault({ min: true, default: 100 }))
+    perPage: number,
     @Query('word') word: string,
     @Query(
       'lang',
@@ -32,7 +35,7 @@ export class AdminController {
     )
     lang: LanguageEnum,
   ) {
-    return this.adminService.search(+page, +perPage, word, lang);
+    return this.adminService.search(page, perPage, word, lang);
   }
 
   @Delete(':id')

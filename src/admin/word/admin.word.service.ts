@@ -4,12 +4,11 @@ import { UpdateWordDto } from 'src/dto/input/update-word.dto';
 import { RavendbService } from 'src/raven/raven.service';
 
 @Injectable()
-export class AdminService {
+export class AdminWordService {
   constructor(private readonly ravendbService: RavendbService) {}
 
   private query(skip: number, lang: string, word: string) {
     const reg = word.replace(/ا/g, '[اأإ]');
-    console.log(word);
 
     return this.ravendbService
       .session()
@@ -19,23 +18,19 @@ export class AdminService {
   }
 
   async search(page: number, perPage: number, word: string, lang: string) {
-    const MAXPP = 100;
-    const maxPerPage = Math.min(MAXPP, perPage);
-
-    const skip = (page - 1) * maxPerPage;
+    const skip = (page - 1) * perPage;
     const total = await this.query(skip, lang, word).count();
-    const totalPages = Math.ceil(total / maxPerPage);
-
+    const totalPages = Math.ceil(total / perPage);
     const res = await this.query(skip, lang, word)
       .selectFields(['id', 'Arabic', 'English', 'Egyptian'])
-      .take(maxPerPage)
+      .take(perPage)
       .all();
 
     return {
       count: total,
       totalPages: totalPages,
       page: page,
-      perPage: maxPerPage,
+      perPage: perPage,
       items: res,
     };
   }

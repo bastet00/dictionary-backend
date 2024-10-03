@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AdminService } from './admin.service';
-import { AdminController } from './admin.controller';
 import { RavendbService } from 'src/raven/raven.service';
+import { AdminWordController } from './word/admin.word.controller';
+import { AdminWordService } from './word/admin.word.service';
 
 @Module({
-  controllers: [AdminController],
-  providers: [AdminService, RavendbService],
+  controllers: [AdminWordController],
+  providers: [AdminWordService, RavendbService],
 })
 export class AdminModule {}
