@@ -20,7 +20,7 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Get()
-  // @UseGuards(LoginGuard)
+  @UseGuards(LoginGuard)
   search(
     @Query('page') page: string = '1',
     @Query('per_page') perPage: string = '100',

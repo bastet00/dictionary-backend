@@ -9,6 +9,7 @@ export class AdminService {
 
   private query(skip: number, lang: string, word: string) {
     const reg = word.replace(/ا/g, '[اأإ]');
+    console.log(word);
 
     return this.ravendbService
       .session()
