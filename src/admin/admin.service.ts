@@ -18,7 +18,6 @@ export class AdminService {
 
   async search(page: number, perPage: number, word: string, lang: string) {
     const skip = (page - 1) * perPage;
-
     const total = await this.query(skip, lang, word).count();
     const maxPerPage = Math.min(100, perPage);
     const totalPages = Math.ceil(total / maxPerPage);
