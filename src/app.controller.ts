@@ -2,22 +2,15 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
-  Delete,
   Get,
-  HttpCode,
-  Param,
   ParseEnumPipe,
   Post,
-  Put,
   Query,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { LanguageEnum } from './dto/language.enum';
 import { BulkCreateWordDto, CreateWordDto } from './dto/input/create-word.dto';
-import { LoginGuard } from './common/guards/login.guard';
-import { UpdateWordDto } from './dto/input/update-word.dto';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller()
@@ -54,18 +47,5 @@ export class AppController {
   @Post('bulk')
   createBulk(@Body() createWordDto: BulkCreateWordDto) {
     return this.appService.createBulk(createWordDto);
-  }
-
-  @Delete(':id')
-  @UseGuards(LoginGuard)
-  @HttpCode(204)
-  delete(@Param('id') id: string) {
-    return this.appService.delete(id);
-  }
-
-  @Put(':id')
-  @UseGuards(LoginGuard)
-  patch(@Param('id') id: string, @Body() updateWordDto: UpdateWordDto) {
-    return this.appService.patch(id, updateWordDto);
   }
 }
