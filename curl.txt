@@ -1,1 +1,3 @@
 curl -w "\n" -X PUT "localhost:3000/6a90b653-a2d7-480b-9812-c35db53e5543" -H "Content-Type:application/json" -d '{"Egyptian":[{"Word":"foo", "Symbol":"𓀎"}], "Arabic":[{"Word":"bar1"}]}' -H "Authorization:"
+
+curl -G --data-urlencode "word=انا" 'http://localhost:3000/search?lang=Arabic'

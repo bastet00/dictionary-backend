@@ -10,6 +10,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -18,6 +19,8 @@ import { LanguageEnum } from './dto/language.enum';
 import { BulkCreateWordDto, CreateWordDto } from './dto/input/create-word.dto';
 import { LoginGuard } from './common/guards/login.guard';
 import { UpdateWordDto } from './dto/input/update-word.dto';
+import { request } from 'http';
+import { Request } from 'express';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller()
