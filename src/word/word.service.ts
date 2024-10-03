@@ -22,11 +22,11 @@ export class WordService {
     const resFullTextSearch = await session
       .query({ collection: 'word' })
       .openSubclause()
-      .whereRegex(`${lang}.Word`, `^${regSearch}$`)
+      .whereRegex(`${lang}.word`, `^${regSearch}$`)
       .closeSubclause()
       .orElse()
       .openSubclause()
-      .whereRegex(`${lang}.Word`, `.*${regSearch}.*`)
+      .whereRegex(`${lang}.word`, `.*${regSearch}.*`)
       .closeSubclause()
       .take(10)
       .all();
