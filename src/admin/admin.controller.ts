@@ -23,7 +23,7 @@ export class AdminController {
   // @UseGuards(LoginGuard)
   search(
     @Query('page') page: string = '1',
-    @Query('per_page') perPage: string,
+    @Query('per_page') perPage: string = '100',
     @Query('word') word: string,
     @Query(
       'lang',

@@ -19,13 +19,11 @@ export class AdminService {
 
   async search(page: number, perPage: number, word: string, lang: string) {
     const MAXPP = 100;
-    const maxPerPage = Math.min(MAXPP, perPage || MAXPP + 1);
+    const maxPerPage = Math.min(MAXPP, perPage);
 
     const skip = (page - 1) * maxPerPage;
     const total = await this.query(skip, lang, word).count();
     const totalPages = Math.ceil(total / maxPerPage);
-
-    console.log(perPage, maxPerPage);
 
     const res = await this.query(skip, lang, word)
       .selectFields(['id', 'Arabic', 'English', 'Egyptian'])
