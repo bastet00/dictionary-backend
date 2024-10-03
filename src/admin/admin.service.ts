@@ -8,12 +8,13 @@ export class AdminService {
   constructor(private readonly ravendbService: RavendbService) {}
 
   private query(skip: number, lang: string, word: string) {
-    word.replace(/ا/g, '[اأإ]');
+    const reg = word.replace(/ا/g, '[اأإ]');
+
     return this.ravendbService
       .session()
       .query({ collection: 'word' })
       .skip(skip)
-      .whereRegex(`${lang}.Word`, `\\b${word}.*`);
+      .whereRegex(`${lang}.Word`, `\\b${reg}.*`);
   }
 
   async search(page: number, perPage: number, word: string, lang: string) {
