@@ -17,6 +17,30 @@ export class AppService {
     return wordReg;
   }
 
+  private swapping(idxs: { change: number; with: number }, res: Word[]) {
+    const stash = res[idxs.change];
+    res[idxs.change] = res[idxs.with];
+    res[idxs.with] = stash;
+    return res;
+  }
+
+  private sortOnLength(res: Word[], lang: LanguageEnum, input: string) {
+    let moveUp = 0;
+    for (const [idx, doc] of Object.entries(res)) {
+      const curr = doc[lang].map((obj: { Word: string }) => obj.Word);
+      const removeBrackets = curr[0]
+        .slice(curr[0].indexOf(')') + 1, curr[0].length)
+        .trim();
+
+      if (curr.length === 1 && input.length === removeBrackets.length) {
+        this.swapping({ change: moveUp, with: +idx }, res);
+        moveUp++;
+      }
+    }
+
+    return res;
+  }
+
   async search(lang: LanguageEnum, word: string) {
     const regSearch = this.applyRegex(word);
     const session = this.ravendbService.session();
@@ -31,7 +55,11 @@ export class AppService {
       .closeSubclause()
       .take(10)
       .all();
-    return this.toDto(resFullTextSearch as Word[]);
+    return this.sortOnLength(
+      this.toDto(resFullTextSearch as Word[]),
+      lang,
+      word,
+    );
   }
 
   private toDto(res: Word[]): Word[] {
