@@ -24,7 +24,7 @@ export class AdminWordController {
   @UseGuards(LoginGuard)
   search(
     @DefaultMinMaxValue({ key: 'page', default: 1, min: false }) page: number,
-    @DefaultMinMaxValue({ key: 'per_page', default: 100, min: true })
+    @DefaultMinMaxValue({ key: 'perPage', default: 100, min: true })
     perPage: number,
     @Query('word') word: string,
     @Query(
