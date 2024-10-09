@@ -3,7 +3,9 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Get,
+  Param,
   ParseEnumPipe,
+  ParseUUIDPipe,
   Post,
   Query,
   UseInterceptors,
@@ -37,6 +39,11 @@ export class WordController {
     @Query('lang', new ParseEnumPipe(LanguageEnum)) language: LanguageEnum,
   ) {
     return this.appService.search(language, word);
+  }
+
+  @Get(':id')
+  getOne(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.appService.getOne(id);
   }
 
   @Post()

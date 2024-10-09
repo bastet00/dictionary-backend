@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { RavendbService } from '../raven/raven.service';
 import { LanguageEnum } from '../dto/language.enum';
 import { BulkCreateWordDto, CreateWordDto } from '../dto/input/create-word.dto';
@@ -54,5 +54,18 @@ export class WordService {
         this.ravendbService.saveToDb(payload, 'word');
       }),
     );
+  }
+
+  async getOne(id: string) {
+    const doc = (await this.ravendbService.session().load(id)) as Word;
+    if (!doc) {
+      throw new NotFoundException('id doesnt exist');
+    }
+    return {
+      id: doc.id,
+      egyptian: doc.egyptian,
+      arabic: doc.arabic,
+      english: doc.english,
+    };
   }
 }
