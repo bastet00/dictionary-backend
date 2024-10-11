@@ -61,11 +61,6 @@ export class WordService {
     if (!doc) {
       throw new NotFoundException('id doesnt exist');
     }
-    return {
-      id: doc.id,
-      egyptian: doc.egyptian,
-      arabic: doc.arabic,
-      english: doc.english,
-    };
+    return doc;
   }
 }
