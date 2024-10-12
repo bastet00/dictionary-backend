@@ -24,6 +24,7 @@ export class AdminWordService {
     const res = await this.query(skip, lang, word)
       .selectFields(['id', 'arabic', 'english', 'egyptian'])
       .take(perPage)
+      .orderByScore()
       .all();
 
     return {

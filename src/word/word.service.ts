@@ -29,6 +29,7 @@ export class WordService {
       .whereRegex(`${lang}.word`, `.*${regSearch}.*`)
       .closeSubclause()
       .take(10)
+      .orderByScore()
       .all();
     return this.toDto(resFullTextSearch as Word[]);
   }
