@@ -21,24 +21,20 @@ export class WordService {
   }
 
   async search(lang: LanguageEnum, word: string) {
-    try {
-      const regSearch = this.applyRegex(word);
-      const session = this.ravendbService.session();
-      const resFullTextSearch = await session
-        .query({ collection: 'word' })
-        .openSubclause()
-        .whereRegex(`${lang}.word`, `^${regSearch}$`)
-        .closeSubclause()
-        .orElse()
-        .openSubclause()
-        .whereRegex(`${lang}.word`, `.*${regSearch}.*`)
-        .closeSubclause()
-        .take(10)
-        .all();
-      return this.toDto(resFullTextSearch as Word[]);
-    } catch {
-      throw new BadRequestException('short length word contains symbols');
-    }
+    const regSearch = this.applyRegex(word);
+    const session = this.ravendbService.session();
+    const resFullTextSearch = await session
+      .query({ collection: 'word' })
+      .openSubclause()
+      .whereRegex(`${lang}.word`, `^${regSearch}$`)
+      .closeSubclause()
+      .orElse()
+      .openSubclause()
+      .whereRegex(`${lang}.word`, `.*${regSearch}.*`)
+      .closeSubclause()
+      .take(10)
+      .all();
+    return this.toDto(resFullTextSearch as Word[]);
   }
 
   private toDto(res: Word[]): Word[] {
