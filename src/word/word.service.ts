@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { RavendbService } from '../raven/raven.service';
 import { LanguageEnum } from '../dto/language.enum';
 import { BulkCreateWordDto, CreateWordDto } from '../dto/input/create-word.dto';
@@ -17,20 +21,24 @@ export class WordService {
   }
 
   async search(lang: LanguageEnum, word: string) {
-    const regSearch = this.applyRegex(word);
-    const session = this.ravendbService.session();
-    const resFullTextSearch = await session
-      .query({ collection: 'word' })
-      .openSubclause()
-      .whereRegex(`${lang}.word`, `^${regSearch}$`)
-      .closeSubclause()
-      .orElse()
-      .openSubclause()
-      .whereRegex(`${lang}.word`, `.*${regSearch}.*`)
-      .closeSubclause()
-      .take(10)
-      .all();
-    return this.toDto(resFullTextSearch as Word[]);
+    try {
+      const regSearch = this.applyRegex(word);
+      const session = this.ravendbService.session();
+      const resFullTextSearch = await session
+        .query({ collection: 'word' })
+        .openSubclause()
+        .whereRegex(`${lang}.word`, `^${regSearch}$`)
+        .closeSubclause()
+        .orElse()
+        .openSubclause()
+        .whereRegex(`${lang}.word`, `.*${regSearch}.*`)
+        .closeSubclause()
+        .take(10)
+        .all();
+      return this.toDto(resFullTextSearch as Word[]);
+    } catch {
+      throw new BadRequestException('short length word contains symbols');
+    }
   }
 
   private toDto(res: Word[]): Word[] {
