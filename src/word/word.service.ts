@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { RavendbService } from '../raven/raven.service';
 import { LanguageEnum } from '../dto/language.enum';
 import { BulkCreateWordDto, CreateWordDto } from '../dto/input/create-word.dto';
