@@ -4,6 +4,11 @@ on:
   push:
     branches: [ main ]
   pull_request:
+
+permissions:
+  id-token: write
+  contents: read
+  checks: write
   
 jobs:
   build:
@@ -25,7 +30,7 @@ jobs:
       - name: Install Packages
         run: npm ci
       - name: test executor 
-        run: npm run test --reporters=default --reporters=jest-junit
+        run: npm run test --ci --reporters=default --reporters=jest-junit
       - name: Test Report
         uses: dorny/test-reporter@v1
         if: success() || failure()
