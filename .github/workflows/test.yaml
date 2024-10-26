@@ -25,11 +25,13 @@ jobs:
       - name: Install Packages
         run: npm ci
       - name: test executor 
-        run: npm run test:cov --ci --reporters=default --reporters=jest-junit
+        run: npm run test:reports --ci --reporters=default --reporters=jest-junit
+        env:
+          JEST_JUNIT_OUTPUT_DIR: reports
       - name: Test Report
         uses: dorny/test-reporter@v1
         if: success() || failure()
         with:
-          name: JEST Tests Report
-          path: app/reports/*.xml
+          name: jest report
+          path: reports/*.xml
           reporter: jest-junit
