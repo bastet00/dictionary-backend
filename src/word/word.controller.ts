@@ -13,6 +13,7 @@ import {
 import { WordService } from './word.service';
 import { LanguageEnum } from '../dto/language.enum';
 import { BulkCreateWordDto, CreateWordDto } from '../dto/input/create-word.dto';
+import { SanitizeSpecialCharsPipe } from 'src/common/custom-pipes/sanitizeSymbolPipe';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('word')
@@ -35,8 +36,9 @@ export class WordController {
    */
   @Get('search')
   search(
-    @Query('word') word: string,
-    @Query('lang', new ParseEnumPipe(LanguageEnum)) language: LanguageEnum,
+    @Query('word', new SanitizeSpecialCharsPipe()) word: string,
+    @Query('lang', new ParseEnumPipe(LanguageEnum))
+    language: LanguageEnum,
   ) {
     return this.appService.search(language, word);
   }
