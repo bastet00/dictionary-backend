@@ -72,9 +72,6 @@
       "default",
       ["jest-junit", { "outputDirectory": "reports" }]
     ],
-    "testEnvironment": "node",
-    "engines": {
-      "node": "^20.0.0"
-    }
+    "testEnvironment": "node"
   }
 }
