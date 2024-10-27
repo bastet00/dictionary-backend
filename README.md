@@ -4,7 +4,8 @@
 ```
 npm install
 npm run prepare
-docker compose up -d # for raven db
+sudo chmod -R 777 ./data
+docker compose up -d  # check http://localhost:8080
 npm run start
 ```
 
