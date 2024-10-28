@@ -3,6 +3,7 @@ import { RavendbService } from '../raven/raven.service';
 import { LanguageEnum } from '../dto/language.enum';
 import { BulkCreateWordDto, CreateWordDto } from '../dto/input/create-word.dto';
 import { Word } from '../raven/entities/word.entity';
+import { toHieroglyphicsSign } from '../dto/transformer';
 
 @Injectable()
 export class WordService {
@@ -62,6 +63,9 @@ export class WordService {
     if (!doc) {
       throw new NotFoundException('id doesnt exist');
     }
-    return doc;
+    return {
+      ...doc,
+      hieroglyphicSigns: toHieroglyphicsSign(doc.egyptian[0].hieroglyphics),
+    };
   }
 }
