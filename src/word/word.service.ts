@@ -2,7 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { RavendbService } from '../raven/raven.service';
 import { LanguageEnum } from '../dto/language.enum';
 import { BulkCreateWordDto, CreateWordDto } from '../dto/input/create-word.dto';
-import { Word } from '../raven/entities/word.entity';
+import { Word, WordDetailDto } from '../raven/entities/word.entity';
+import { toHieroglyphicsSign } from '../dto/transformer';
 
 @Injectable()
 export class WordService {
@@ -57,11 +58,19 @@ export class WordService {
     );
   }
 
-  async getOne(id: string) {
+  async getOne(id: string): Promise<WordDetailDto> {
     const doc = (await this.ravendbService.session().load(id)) as Word;
     if (!doc) {
       throw new NotFoundException('id doesnt exist');
     }
-    return doc;
+    return {
+      ...doc,
+      egyptian: [
+        {
+          ...doc.egyptian[0],
+          hieroglyphicSigns: toHieroglyphicsSign(doc.egyptian[0].hieroglyphics),
+        },
+      ],
+    };
   }
 }
