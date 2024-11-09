@@ -56,6 +56,19 @@ export class CreateWordDto {
   @ValidateNested({ each: true })
   english: WordDto[];
 
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(1)
+  @Type(() => WordDto)
+  @ValidateNested({ each: true })
+  french: WordDto[];
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsString({ each: true })
+  resources: string[];
+
   @IsNotEmpty()
   @IsArray()
   @ArrayMinSize(1)
