@@ -776,4 +776,6 @@ export const singMapper = {
   N33A: '𓈓',
   A57: '𓁂',
   Z4A: '𓏮',
+  M1A: '𓆮',
+  C10A: '𓁧',
 };
