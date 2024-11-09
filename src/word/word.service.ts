@@ -29,7 +29,7 @@ export class WordService {
       let concat = '';
 
       words.slice(0, 3).forEach((word) => {
-        concat += `.*${word}.*|`;
+        concat += `.*${word.replace(/ا/g, '[اأإ]')}.*|`;
       });
 
       return concat.slice(0, -1);
