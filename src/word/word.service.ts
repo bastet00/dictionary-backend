@@ -13,7 +13,7 @@ export class WordService {
     const lettersSwapping = word.replace(/ا/g, '[اأإ]');
     const patterns = {
       exactOrGlobalSearch:
-        origWordLength <= 2
+        origWordLength <= 3
           ? this.exactRegexMatch(lettersSwapping)
           : `.*${lettersSwapping}.*`,
       wordSplited: `.*${this.splitWord(lettersSwapping)}.*`,
