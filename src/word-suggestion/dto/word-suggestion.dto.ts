@@ -5,10 +5,12 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Length,
   ValidateNested,
 } from 'class-validator';
 import { EgyptianWordDto } from 'src/dto/input/create-word.dto';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
+import { toUTF32String } from 'src/dto/transformer';
 
 class TranslationDto {
   @IsString()
@@ -16,6 +18,13 @@ class TranslationDto {
   word: string;
 }
 
+export class EgyptianWordSuggestionDto extends EgyptianWordDto {
+  @IsOptional()
+  @Length(8)
+  @Transform(({ value }) => value.trim())
+  @Transform(toUTF32String)
+  symbol: string;
+}
 export class CreateSuggestionDto {
   @IsOptional()
   @IsEmail()
@@ -33,10 +42,10 @@ export class CreateSuggestionDto {
   @ValidateNested({ each: true })
   english: TranslationDto[];
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsArray()
   @ArrayMinSize(1)
-  @Type(() => EgyptianWordDto)
+  @Type(() => EgyptianWordSuggestionDto)
   @ValidateNested({ each: true })
-  egyptian: EgyptianWordDto[];
+  egyptian: EgyptianWordSuggestionDto[];
 }
