@@ -8,7 +8,7 @@ import { Word } from '../raven/entities/word.entity';
 export class WordService {
   constructor(private readonly ravendbService: RavendbService) {}
 
-  searchPatterns(word: string) {
+  private searchPatterns(word: string) {
     const origWordLength = word.length;
     const lettersSwapping = word.replace(/ا/g, '[اأإ]');
     const patterns = {
@@ -46,7 +46,6 @@ export class WordService {
   async search(lang: LanguageEnum, word: string) {
     const patterns = this.searchPatterns(word);
     console.log(patterns);
-
     const session = this.ravendbService.session();
     const resFullTextSearch = await session
       .query({ collection: 'word' })
