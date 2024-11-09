@@ -17,7 +17,7 @@ export class WordService {
         origWordLength <= 3
           ? this.exactRegexMatch(lettersSwapping)
           : `.*${lettersSwapping}.*`,
-      wordSplited: `${this.splitWord(lettersSwapping)}`,
+      wordSplited: `${this.splitWord(word)}`,
     };
     return patterns;
   }
@@ -29,13 +29,16 @@ export class WordService {
       let concat = '';
 
       words.slice(0, 3).forEach((word) => {
-        concat += `.*${word}.*|`;
+        concat += `.*${word.replace(/ا/g, '[اأإ]')}.*|`;
       });
 
       return concat.slice(0, -1);
     }
 
-    return `.*${words[0].slice(0, Math.ceil(words[0].length / 2))}.*`;
+    return `.*${words[0].slice(0, Math.ceil(words[0].length / 2))}.*`.replace(
+      /ا/g,
+      '[اأإ]',
+    );
   }
 
   private exactRegexMatch(word: string) {
