@@ -28,7 +28,7 @@ export const splitGardinerValues = (gardinerValues: string): string[] => {
 };
 const containsSymbolsToReplace = (gardinerValues: string): boolean => {
   for (const char of gardinerValues) {
-    if (symbolsToReplace.has(char)) {
+    if (symbolsToReplace.has(char) || char === '-') {
       return true;
     }
   }
