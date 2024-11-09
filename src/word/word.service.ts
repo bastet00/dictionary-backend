@@ -44,8 +44,6 @@ export class WordService {
 
   async search(lang: LanguageEnum, word: string) {
     const patterns = this.searchPatterns(word);
-    console.log(patterns);
-
     const session = this.ravendbService.session();
     const resFullTextSearch = await session
       .query({ collection: 'word' })
