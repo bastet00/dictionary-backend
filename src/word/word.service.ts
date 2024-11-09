@@ -3,31 +3,56 @@ import { RavendbService } from '../raven/raven.service';
 import { LanguageEnum } from '../dto/language.enum';
 import { BulkCreateWordDto, CreateWordDto } from '../dto/input/create-word.dto';
 import { Word, WordDetailDto } from '../raven/entities/word.entity';
-import { toHieroglyphicsSign } from '../dto/transformer';
+import { toHieroglyphicsSign } from 'src/dto/transformer';
 
 @Injectable()
 export class WordService {
   constructor(private readonly ravendbService: RavendbService) {}
 
-  private applyRegex(word: string) {
-    let wordReg = word.replace(/ا/g, '[اأإ]');
-    if (word.length <= 2) {
-      wordReg = `\\b${wordReg}\\b`;
+  searchPatterns(word: string) {
+    const origWordLength = word.trim().length;
+    const lettersSwapping = word.trim().replace(/ا/g, '[اأإ]');
+    const patterns = {
+      exactOrGlobalSearch:
+        origWordLength <= 3
+          ? this.exactRegexMatch(lettersSwapping)
+          : `.*${lettersSwapping}.*`,
+      wordSplited: `${this.splitWord(lettersSwapping)}`,
+    };
+    return patterns;
+  }
+
+  private splitWord(word: string) {
+    const words = word.split(' ');
+
+    if (words.length > 1) {
+      let concat = '';
+
+      words.slice(0, 3).forEach((word) => {
+        concat += `.*${word}.*|`;
+      });
+
+      return concat.slice(0, -1);
     }
-    return wordReg;
+
+    return `.*${words[0].slice(0, Math.ceil(words[0].length / 2))}.*`;
+  }
+
+  private exactRegexMatch(word: string) {
+    return `^\\b${word}\\b$`;
   }
 
   async search(lang: LanguageEnum, word: string) {
-    const regSearch = this.applyRegex(word);
+    const patterns = this.searchPatterns(word);
     const session = this.ravendbService.session();
     const resFullTextSearch = await session
       .query({ collection: 'word' })
       .openSubclause()
-      .whereRegex(`${lang}.word`, `^${regSearch}$`)
+      .whereRegex(`${lang}.word`, patterns.exactOrGlobalSearch)
       .closeSubclause()
       .orElse()
       .openSubclause()
-      .whereRegex(`${lang}.word`, `.*${regSearch}.*`)
+      .whereRegex(`${lang}.word`, patterns.wordSplited)
       .closeSubclause()
       .take(10)
       .orderByScore()
