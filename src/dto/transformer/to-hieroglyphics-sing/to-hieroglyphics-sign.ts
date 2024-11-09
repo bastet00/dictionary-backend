@@ -1,3 +1,4 @@
+import { isArray } from 'class-validator';
 import { singMapper } from './sing-mapper';
 
 const symbolsToReplace: Set<string> = new Set([
@@ -35,10 +36,14 @@ const containsSymbolsToReplace = (gardinerValues: string): boolean => {
   return false;
 };
 export const toHieroglyphicsSign = (gardinerValues: string[]): string[] => {
+  if (
+    isArray(gardinerValues) &&
+    gardinerValues.length > 0 &&
+    containsSymbolsToReplace(gardinerValues[0])
+  ) {
+    return toHieroglyphicsSign(splitGardinerValues(gardinerValues[0]));
+  }
   return gardinerValues.map((gardinerValue) => {
-    if (containsSymbolsToReplace(gardinerValue)) {
-      return toHieroglyphicsSign(splitGardinerValues(gardinerValue));
-    }
     const hieroglyphicsSign = singMapper[gardinerValue];
     if (!hieroglyphicsSign) {
       return gardinerValue;
