@@ -15,9 +15,9 @@ export class WordService {
     const patterns = {
       exactOrGlobalSearch:
         origWordLength <= 3
-          ? this.exactRegexMatch(lettersSwapping)
+          ? this.exactRegexMatch(word)
           : `.*${lettersSwapping}.*`,
-      wordSplited: `${this.splitWord(lettersSwapping)}`,
+      wordSplited: `${this.splitWord(word)}`,
     };
     return patterns;
   }
@@ -35,7 +35,10 @@ export class WordService {
       return concat.slice(0, -1);
     }
 
-    return `.*${words[0].slice(0, Math.ceil(words[0].length / 2))}.*`;
+    return `.*${words[0].slice(0, Math.ceil(words[0].length / 2))}.*`.replace(
+      /ا/g,
+      '[اأإ]',
+    );
   }
 
   private exactRegexMatch(word: string) {
