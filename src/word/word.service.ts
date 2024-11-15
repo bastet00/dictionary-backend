@@ -10,7 +10,7 @@ export class WordService {
   constructor(private readonly ravendbService: RavendbService) {}
 
   searchPatterns(word: string) {
-    return word.trim().replace(/ا/g, '[اأإ]');
+    return `^\\b${word}\\b$`.trim().replace(/ا/g, '[اأإ]');
   }
 
   private splitWord(word: string) {
@@ -34,7 +34,7 @@ export class WordService {
       .query<Word>({ collection: 'word' })
       .whereIn(`${lang}.word`, terms)
       .take(10)
-      .orderByScore()
+      .orderByScoreDescending()
       .all();
     return this.toDto(suggestionResults);
   }
@@ -59,17 +59,15 @@ export class WordService {
     let resFullTextSearch = await session
       .query<Word>({ collection: 'word' })
       .openSubclause()
-      .whereEquals(`${lang}.word`, this.searchPatterns(word))
+      .whereRegex(`${lang}.word`, this.searchPatterns(word))
       .closeSubclause();
 
-    if (lang === LanguageEnum.arabic) {
-      if (word.substring(0, 2) === 'ال') {
-        resFullTextSearch = resFullTextSearch
-          .orElse()
-          .openSubclause()
-          .whereRegex(`${lang}.word`, this.searchPatterns(word.substring(2)))
-          .closeSubclause();
-      }
+    if (lang === LanguageEnum.arabic && word.substring(0, 2) === 'ال') {
+      resFullTextSearch = resFullTextSearch
+        .orElse()
+        .openSubclause()
+        .whereRegex(`${lang}.word`, this.searchPatterns(word.substring(2)))
+        .closeSubclause();
     }
     if (word.split(' ').length > 1) {
       resFullTextSearch = resFullTextSearch
@@ -78,7 +76,10 @@ export class WordService {
         .whereRegex(`${lang}.word`, this.splitWord(word))
         .closeSubclause();
     }
-    const searchResults = await resFullTextSearch.take(10).orderByScore().all();
+    const searchResults = await resFullTextSearch
+      .take(10)
+      .orderByScoreDescending()
+      .all();
     return this.toDto(searchResults);
   }
 
