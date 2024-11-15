@@ -9,6 +9,19 @@ import { toHieroglyphicsSign } from 'src/dto/transformer';
 export class WordService {
   constructor(private readonly ravendbService: RavendbService) {}
 
+  private isLatin(text: string): boolean {
+    return [...text].some(
+      (char) => (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z'),
+    );
+  }
+
+  languageSecretSwitch(word: string): LanguageEnum {
+    if (this.isLatin(word)) {
+      return LanguageEnum.english;
+    }
+    return LanguageEnum.arabic;
+  }
+
   searchPatterns(word: string) {
     return `^\\b${word}\\b$`.trim().replace(/ا/g, '[اأإ]');
   }

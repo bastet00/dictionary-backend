@@ -18,7 +18,7 @@ import { SanitizeSpecialCharsPipe } from 'src/common/custom-pipes/sanitizeSymbol
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('word')
 export class WordController {
-  constructor(private readonly appService: WordService) {}
+  constructor(private readonly wordService: WordService) {}
 
   /**
    * Health check endpoint
@@ -40,21 +40,22 @@ export class WordController {
     @Query('lang', new ParseEnumPipe(LanguageEnum))
     language: LanguageEnum,
   ) {
-    return this.appService.searchAndSuggest(language, word);
+    const lang = this.wordService.languageSecretSwitch(word);
+    return this.wordService.searchAndSuggest(lang ?? language, word);
   }
 
   @Get(':id')
   getOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.appService.getOne(id);
+    return this.wordService.getOne(id);
   }
 
   @Post()
   create(@Body() createWordDto: CreateWordDto) {
-    return this.appService.create(createWordDto);
+    return this.wordService.create(createWordDto);
   }
 
   @Post('bulk')
   createBulk(@Body() createWordDto: BulkCreateWordDto) {
-    return this.appService.createBulk(createWordDto);
+    return this.wordService.createBulk(createWordDto);
   }
 }
