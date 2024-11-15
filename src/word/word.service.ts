@@ -29,7 +29,6 @@ export class WordService {
       return results;
     }
     const terms = await this.suggestions(lang, word);
-    console.log(terms);
     const session = this.ravendbService.session();
     const suggestionResults = await session
       .query<Word>({ collection: 'word' })
