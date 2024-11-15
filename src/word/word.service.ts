@@ -47,7 +47,7 @@ export class WordService {
       .query({ collection: 'word' })
       .suggestUsing((x) =>
         x.byField(`${lang}.word`, word).withOptions({
-          accuracy: 0.7,
+          accuracy: 0.65,
           pageSize: 5,
           distance: 'NGram',
           sortMode: 'Popularity',
