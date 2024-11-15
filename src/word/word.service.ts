@@ -29,11 +29,12 @@ export class WordService {
       return results;
     }
     const terms = await this.suggestions(lang, word);
+    console.log(terms);
     const session = this.ravendbService.session();
     const suggestionResults = await session
       .query<Word>({ collection: 'word' })
       .whereIn(`${lang}.word`, terms)
-      .take(5)
+      .take(10)
       .orderByScore()
       .all();
     return this.toDto(suggestionResults);
@@ -44,7 +45,7 @@ export class WordService {
       .query({ collection: 'word' })
       .suggestUsing((x) =>
         x.byField(`${lang}.word`, word).withOptions({
-          accuracy: 0.5,
+          accuracy: 0.7,
           pageSize: 5,
           distance: 'NGram',
           sortMode: 'Popularity',
@@ -59,7 +60,7 @@ export class WordService {
     let resFullTextSearch = await session
       .query<Word>({ collection: 'word' })
       .openSubclause()
-      .whereRegex(`${lang}.word`, this.searchPatterns(word))
+      .whereEquals(`${lang}.word`, this.searchPatterns(word))
       .closeSubclause();
 
     if (lang === LanguageEnum.arabic) {
