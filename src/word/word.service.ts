@@ -10,57 +10,76 @@ export class WordService {
   constructor(private readonly ravendbService: RavendbService) {}
 
   searchPatterns(word: string) {
-    const origWordLength = word.trim().length;
-    const lettersSwapping = word.trim().replace(/ا/g, '[اأإ]');
-    const patterns = {
-      exactOrGlobalSearch:
-        origWordLength <= 3
-          ? this.exactRegexMatch(lettersSwapping)
-          : `.*${lettersSwapping}.*`,
-      wordSplited: `${this.splitWord(word)}`,
-    };
-    return patterns;
+    return word.trim().replace(/ا/g, '[اأإ]');
   }
 
   private splitWord(word: string) {
-    const words = word.split(' ');
+    const words = word.trim().split(' ');
+    let wordsRegex = '';
 
-    if (words.length > 1) {
-      let concat = '';
+    words.forEach((word) => {
+      wordsRegex += `${this.searchPatterns(word)}|`;
+    });
+    return wordsRegex.slice(0, -1);
+  }
 
-      words.slice(0, 3).forEach((word) => {
-        concat += `.*${word.replace(/ا/g, '[اأإ]')}.*|`;
-      });
-
-      return concat.slice(0, -1);
+  async searchAndSuggest(lang: LanguageEnum, word: string): Promise<Word[]> {
+    const results = await this.search(lang, word);
+    if (results.length) {
+      return results;
     }
-
-    return `.*${words[0].slice(0, Math.ceil(words[0].length / 2))}.*`.replace(
-      /ا/g,
-      '[اأإ]',
-    );
-  }
-
-  private exactRegexMatch(word: string) {
-    return `^\\b${word}\\b$`;
-  }
-
-  async search(lang: LanguageEnum, word: string) {
-    const patterns = this.searchPatterns(word);
+    const terms = await this.suggestions(lang, word);
     const session = this.ravendbService.session();
-    const resFullTextSearch = await session
-      .query({ collection: 'word' })
-      .openSubclause()
-      .whereRegex(`${lang}.word`, patterns.exactOrGlobalSearch)
-      .closeSubclause()
-      .orElse()
-      .openSubclause()
-      .whereRegex(`${lang}.word`, patterns.wordSplited)
-      .closeSubclause()
-      .take(10)
+    const suggestionResults = await session
+      .query<Word>({ collection: 'word' })
+      .whereIn(`${lang}.word`, terms)
+      .take(5)
       .orderByScore()
       .all();
-    return this.toDto(resFullTextSearch as Word[]);
+    return this.toDto(suggestionResults);
+  }
+  async suggestions(lang: LanguageEnum, word: string): Promise<string[]> {
+    const session = this.ravendbService.session();
+    const suggestions = await session
+      .query({ collection: 'word' })
+      .suggestUsing((x) =>
+        x.byField(`${lang}.word`, word).withOptions({
+          accuracy: 0.5,
+          pageSize: 5,
+          distance: 'NGram',
+          sortMode: 'Popularity',
+        }),
+      )
+      .execute();
+    return suggestions[`${lang}.word`].suggestions;
+  }
+
+  async search(lang: LanguageEnum, word: string): Promise<Word[]> {
+    const session = this.ravendbService.session();
+    let resFullTextSearch = await session
+      .query<Word>({ collection: 'word' })
+      .openSubclause()
+      .whereRegex(`${lang}.word`, this.searchPatterns(word))
+      .closeSubclause();
+
+    if (lang === LanguageEnum.arabic) {
+      if (word.substring(0, 2) === 'ال') {
+        resFullTextSearch = resFullTextSearch
+          .orElse()
+          .openSubclause()
+          .whereRegex(`${lang}.word`, this.searchPatterns(word.substring(2)))
+          .closeSubclause();
+      }
+    }
+    if (word.split(' ').length > 1) {
+      resFullTextSearch = resFullTextSearch
+        .orElse()
+        .openSubclause()
+        .whereRegex(`${lang}.word`, this.splitWord(word))
+        .closeSubclause();
+    }
+    const searchResults = await resFullTextSearch.take(10).orderByScore().all();
+    return this.toDto(searchResults);
   }
 
   private toDto(res: Word[]): Word[] {

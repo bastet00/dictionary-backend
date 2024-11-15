@@ -40,7 +40,7 @@ export class WordController {
     @Query('lang', new ParseEnumPipe(LanguageEnum))
     language: LanguageEnum,
   ) {
-    return this.appService.search(language, word);
+    return this.appService.searchAndSuggest(language, word);
   }
 
   @Get(':id')
