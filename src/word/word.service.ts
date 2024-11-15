@@ -18,6 +18,9 @@ export class WordService {
     let wordsRegex = '';
 
     words.forEach((word) => {
+      if (word.substring(0, 2) === 'ال') {
+        wordsRegex += `${this.searchPatterns(word.substring(2))}|`;
+      }
       wordsRegex += `${this.searchPatterns(word)}|`;
     });
     return wordsRegex.slice(0, -1);
