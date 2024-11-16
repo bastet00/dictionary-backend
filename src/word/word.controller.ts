@@ -40,8 +40,8 @@ export class WordController {
     @Query('lang', new ParseEnumPipe(LanguageEnum))
     language: LanguageEnum,
   ) {
-    const lang = this.wordService.languageSecretSwitch(word);
-    return this.wordService.searchAndSuggest(lang ?? language, word);
+    const lang = this.wordService.languageSecretSwitch(word, language);
+    return this.wordService.searchAndSuggest(lang, word);
   }
 
   @Get(':id')

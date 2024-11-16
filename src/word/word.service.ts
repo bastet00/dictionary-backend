@@ -15,11 +15,10 @@ export class WordService {
     );
   }
 
-  languageSecretSwitch(word: string): LanguageEnum {
-    if (this.isLatin(word)) {
+  languageSecretSwitch(word: string, lang: LanguageEnum): LanguageEnum {
+    if (this.isLatin(word) && lang === LanguageEnum.arabic) {
       return LanguageEnum.english;
-    }
-    return LanguageEnum.arabic;
+    } else return lang;
   }
 
   searchPatterns(word: string) {
