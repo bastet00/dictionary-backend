@@ -9,6 +9,7 @@ import { WordModule } from './word/word.module';
 import { AppController } from './app.controller';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { LiteralTranslationModule } from './literal-translation/literal-translation.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { APP_GUARD } from '@nestjs/core';
     PrivacyPolicyModule,
     AdminModule,
     WordModule,
+    LiteralTranslationModule,
   ],
   providers: [
     RavendbService,
