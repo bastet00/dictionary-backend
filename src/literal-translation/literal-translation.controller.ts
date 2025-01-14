@@ -1,5 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { LiteralTranslationService } from './literal-translation.service';
+import { LiteralTranslationResultsDto } from './dto/literal-translation-results.dto';
 
 @Controller('api/v1/literal-translation')
 export class LiteralTranslationController {
@@ -8,7 +9,9 @@ export class LiteralTranslationController {
   ) {}
 
   @Get()
-  fromArabicLettersToHieroglyphics(@Query('text') text: string): string {
+  fromArabicLettersToHieroglyphics(
+    @Query('text') text: string,
+  ): LiteralTranslationResultsDto {
     return this.literalTranslationService.fromArabicLettersToHieroglyphics(
       text,
     );
