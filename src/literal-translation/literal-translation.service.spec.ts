@@ -53,4 +53,26 @@ describe('LiteralTranslationService', () => {
       service.fromArabicLettersToHieroglyphics(word).literalTranslation,
     ).toBe(expectedTranslation);
   });
+
+  it('should return charachtersMapper with the same length as the word', () => {
+    const word = 'سلام';
+    const charachtersMapper =
+      service.fromArabicLettersToHieroglyphics(word).charachtersMapper;
+    expect(charachtersMapper.length).toBe(word.length);
+  });
+
+  it('should return charachtersMapper with array contains letters  and hieroglyphics', () => {
+    const word = 'سلام';
+    const charachtersMapper =
+      service.fromArabicLettersToHieroglyphics(word).charachtersMapper;
+    expect(charachtersMapper[0].alphabetCharachters).toBe('س');
+    expect(charachtersMapper[1].alphabetCharachters).toBe('ل');
+    expect(charachtersMapper[2].alphabetCharachters).toBe('ا');
+    expect(charachtersMapper[3].alphabetCharachters).toBe('م');
+    // Assuming these are the correct hieroglyphics
+    expect(charachtersMapper[0].hieroglyphics).toBe('𓋴');
+    expect(charachtersMapper[1].hieroglyphics).toBe('𓃭');
+    expect(charachtersMapper[2].hieroglyphics).toBe('𓄿');
+    expect(charachtersMapper[3].hieroglyphics).toBe('𓅓');
+  });
 });

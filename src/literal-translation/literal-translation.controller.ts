@@ -10,10 +10,12 @@ export class LiteralTranslationController {
 
   @Get()
   fromArabicLettersToHieroglyphics(
-    @Query('text') text: string,
+    @Query('word') word: string,
+    @Query('addition') addition?: string,
   ): LiteralTranslationResultsDto {
     return this.literalTranslationService.fromArabicLettersToHieroglyphics(
-      text,
+      word,
+      { addition },
     );
   }
 }
