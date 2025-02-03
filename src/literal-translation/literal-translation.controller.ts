@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, ParseBoolPipe, Query } from '@nestjs/common';
 import { LiteralTranslationService } from './literal-translation.service';
 import { LiteralTranslationResultsDto } from './dto/literal-translation-results.dto';
 
@@ -11,10 +11,13 @@ export class LiteralTranslationController {
   @Get()
   fromArabicLettersToHieroglyphics(
     @Query('word') word: string,
+    @Query('multiple-sound-symbol', new ParseBoolPipe())
+    mutliSoundSymbol?: boolean,
     @Query('addition') addition?: string,
   ): LiteralTranslationResultsDto {
     return this.literalTranslationService.fromArabicLettersToHieroglyphics(
       word,
+      mutliSoundSymbol,
       { addition },
     );
   }

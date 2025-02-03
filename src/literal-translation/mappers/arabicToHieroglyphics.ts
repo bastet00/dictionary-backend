@@ -31,8 +31,6 @@ export const arabicToHieroglyphics: { [key: string]: string } = {
   ج: '𓆓',
   // TODO: for Amro, add the following mappings
   نفر: '𓄤',
-  عب: '𓃁',
-  مت: '𓄾',
-  اا: '𓅀',
-  مع: '𓅖',
+  عنخ: '𓂀',
+  نو: '𓌝',
 };

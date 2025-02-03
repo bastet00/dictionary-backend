@@ -4,6 +4,7 @@ import {
   CharachtersMapper,
   LiteralTranslationResultsDto,
 } from './dto/literal-translation-results.dto';
+
 @Injectable()
 export class LiteralTranslationService {
   /*
@@ -14,19 +15,37 @@ export class LiteralTranslationService {
     */
   fromArabicLettersToHieroglyphics(
     word: string,
+    multiSoundSymbol: boolean = false,
     options: { addition?: string } = {},
   ): LiteralTranslationResultsDto {
-    const wordArray = word.split('');
-    let literalTranslation = wordArray
-      .map((letter) => arabicToHieroglyphics[letter] || letter)
-      .join('');
-    //TODO: Implement the charachtersMapper for hieroglyphics with multiple charachters
-    const charachtersMapper: CharachtersMapper = wordArray.map((letter) => {
-      return {
-        alphabetCharachters: letter,
-        hieroglyphics: arabicToHieroglyphics[letter] || letter,
-      };
-    });
+    const charachtersMapper: CharachtersMapper = [];
+    const prefixLength = multiSoundSymbol ? 3 : 1;
+    let literalTranslation = '';
+    let start = 0;
+    let end = prefixLength;
+    while (start < end) {
+      const prefix = word.slice(start, end);
+      const { foundedObj, stopAt } = this.longgestFoundPrefix(prefix);
+      const match = Object.keys(foundedObj)[0];
+      if (!match) {
+        literalTranslation = word;
+        break;
+      }
+
+      charachtersMapper.push({
+        alphabetCharachters: match,
+        hieroglyphics: foundedObj[match],
+      });
+
+      literalTranslation += foundedObj[match];
+
+      start += stopAt + 1;
+      end = start + prefixLength;
+      if (start + prefixLength > word.length) {
+        end = word.length;
+      }
+    }
+
     const { addition } = options;
     if (addition) {
       literalTranslation += addition;
@@ -35,5 +54,24 @@ export class LiteralTranslationService {
       literalTranslation,
       charachtersMapper,
     };
+  }
+
+  private longgestFoundPrefix(prefix: string) {
+    /**
+     * @returns:
+     *    foundedObj: An object with the longest found prefix mapped to its value
+     *    `stopAt`: index which indicates where the match is found
+     */
+
+    if (prefix.length === 0) return { foundedObj: {}, stopAt: 0 }; //safe
+    const stopAt = prefix.length - 1;
+    const foundedObj = {};
+    foundedObj[prefix] = arabicToHieroglyphics[prefix];
+
+    if (!foundedObj[prefix]) {
+      return this.longgestFoundPrefix(prefix.slice(0, stopAt));
+    }
+
+    return { foundedObj, stopAt };
   }
 }
