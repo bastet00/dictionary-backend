@@ -133,4 +133,16 @@ describe('LiteralTranslationService', () => {
     expect(charachtersMapper[3].alphabetCharachters).toBe('نو');
     expect(charachtersMapper[3].hieroglyphics).toBe('𓌝');
   });
+
+  it('should handle spaces between words', () => {
+    const word = 'نو ر';
+    const charachtersMapper = service.fromArabicLettersToHieroglyphics(
+      word,
+      true,
+    ).charachtersMapper;
+    expect(charachtersMapper[0].alphabetCharachters).toBe('نو');
+    expect(charachtersMapper[0].hieroglyphics).toBe('𓌝');
+    expect(charachtersMapper[1].alphabetCharachters).toBe('ر');
+    expect(charachtersMapper[1].hieroglyphics).toBe('𓂋');
+  });
 });

@@ -10,13 +10,13 @@ export class LiteralTranslationController {
 
   @Get()
   fromArabicLettersToHieroglyphics(
-    @Query('word') word: string,
+    @Query('text') text: string,
     @Query('multiple-sound-symbol', new ParseBoolPipe())
     mutliSoundSymbol?: boolean,
     @Query('addition') addition?: string,
   ): LiteralTranslationResultsDto {
     return this.literalTranslationService.fromArabicLettersToHieroglyphics(
-      word,
+      text,
       mutliSoundSymbol,
       { addition },
     );

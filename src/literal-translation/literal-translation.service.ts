@@ -14,21 +14,24 @@ export class LiteralTranslationService {
     * @returns The literal translation of the word
     */
   fromArabicLettersToHieroglyphics(
-    word: string,
+    text: string,
     multiSoundSymbol: boolean = false,
     options: { addition?: string } = {},
   ): LiteralTranslationResultsDto {
+    text = text.replaceAll(' ', '');
     const charachtersMapper: CharachtersMapper = [];
     const prefixLength = multiSoundSymbol ? 3 : 1;
     let literalTranslation = '';
     let start = 0;
     let end = prefixLength;
+
     while (start < end) {
-      const prefix = word.slice(start, end);
+      const prefix = text.slice(start, end);
       const { foundedObj, stopAt } = this.longgestFoundPrefix(prefix);
       const match = Object.keys(foundedObj)[0];
+
       if (!match) {
-        literalTranslation = word;
+        literalTranslation = text;
         break;
       }
 
@@ -41,8 +44,8 @@ export class LiteralTranslationService {
 
       start += stopAt + 1;
       end = start + prefixLength;
-      if (start + prefixLength > word.length) {
-        end = word.length;
+      if (end > text.length) {
+        end = text.length;
       }
     }
 
