@@ -4,7 +4,7 @@ import {
   CharachtersMapper,
   LiteralTranslationResultsDto,
 } from './dto/literal-translation-results.dto';
-import { GenderEnum } from 'src/dto/gender.enum';
+import { GenderEnum } from './dto/gender.enum';
 
 @Injectable()
 export class LiteralTranslationService {
@@ -16,8 +16,8 @@ export class LiteralTranslationService {
     */
   fromArabicLettersToHieroglyphics(
     text: string,
-    multiSoundSymbol: boolean = false,
     gender: GenderEnum,
+    multiSoundSymbol: boolean = false,
   ): LiteralTranslationResultsDto {
     text = text.replaceAll(' ', '');
     const charachtersMapper: CharachtersMapper = [];

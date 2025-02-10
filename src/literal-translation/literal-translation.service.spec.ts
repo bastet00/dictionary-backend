@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LiteralTranslationService } from './literal-translation.service';
+import { GenderEnum } from './dto/gender.enum';
 
 describe('LiteralTranslationService', () => {
   let service: LiteralTranslationService;
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [LiteralTranslationService],
@@ -20,7 +20,8 @@ describe('LiteralTranslationService', () => {
     const word = 'سلام';
     const expectedTranslation = '𓋴𓃭𓄿𓅓'; // Assuming these are the correct hieroglyphics
     expect(
-      service.fromArabicLettersToHieroglyphics(word).literalTranslation,
+      service.fromArabicLettersToHieroglyphics(word, GenderEnum.NONE)
+        .literalTranslation,
     ).toBe(expectedTranslation);
   });
 
@@ -28,35 +29,42 @@ describe('LiteralTranslationService', () => {
     const word = 'عمرو';
     const expectedTranslation = '𓂝𓅓𓂋𓅱'; // Assuming these are the correct hieroglyphics
     expect(
-      service.fromArabicLettersToHieroglyphics(word).literalTranslation,
+      service.fromArabicLettersToHieroglyphics(word, GenderEnum.NONE)
+        .literalTranslation,
     ).toBe(expectedTranslation);
   });
 
   it('should return the same word if no translation is found', () => {
     const word = 'hello';
     expect(
-      service.fromArabicLettersToHieroglyphics(word).literalTranslation,
+      service.fromArabicLettersToHieroglyphics(word, GenderEnum.NONE)
+        .literalTranslation,
     ).toBe(word);
   });
 
   it('should handle empty strings', () => {
     const word = '';
     expect(
-      service.fromArabicLettersToHieroglyphics(word).literalTranslation,
+      service.fromArabicLettersToHieroglyphics(word, GenderEnum.NONE)
+        .literalTranslation,
     ).toBe(word);
   });
 
   it('should return charachtersMapper with the same length as the word', () => {
     const word = 'سلام';
-    const charachtersMapper =
-      service.fromArabicLettersToHieroglyphics(word).charachtersMapper;
+    const charachtersMapper = service.fromArabicLettersToHieroglyphics(
+      word,
+      GenderEnum.NONE,
+    ).charachtersMapper;
     expect(charachtersMapper.length).toBe(word.length);
   });
 
   it('should return charachtersMapper with array contains letters  and hieroglyphics', () => {
     const word = 'سلام';
-    const charachtersMapper =
-      service.fromArabicLettersToHieroglyphics(word).charachtersMapper;
+    const charachtersMapper = service.fromArabicLettersToHieroglyphics(
+      word,
+      GenderEnum.NONE,
+    ).charachtersMapper;
     expect(charachtersMapper[0].alphabetCharachters).toBe('س');
     expect(charachtersMapper[1].alphabetCharachters).toBe('ل');
     expect(charachtersMapper[2].alphabetCharachters).toBe('ا');
@@ -72,6 +80,7 @@ describe('LiteralTranslationService', () => {
     const word = 'نفرتيتي';
     const charachtersMapper = service.fromArabicLettersToHieroglyphics(
       word,
+      GenderEnum.NONE,
       true, // enable multi-sound query
     ).charachtersMapper;
     expect(charachtersMapper[0].alphabetCharachters).toBe('نفر');
@@ -82,6 +91,8 @@ describe('LiteralTranslationService', () => {
     const word = 'عنخ';
     const charachtersMapper = service.fromArabicLettersToHieroglyphics(
       word,
+
+      GenderEnum.NONE,
       true,
     ).charachtersMapper;
     expect(charachtersMapper[0].alphabetCharachters).toBe('عنخ');
@@ -92,6 +103,8 @@ describe('LiteralTranslationService', () => {
     const word = 'كتابعنخ';
     const charachtersMapper = service.fromArabicLettersToHieroglyphics(
       word,
+
+      GenderEnum.NONE,
       true,
     ).charachtersMapper;
     expect(charachtersMapper[0].alphabetCharachters).toBe('ك');
@@ -110,6 +123,8 @@ describe('LiteralTranslationService', () => {
     const word = 'نور';
     const charachtersMapper = service.fromArabicLettersToHieroglyphics(
       word,
+
+      GenderEnum.NONE,
       true,
     ).charachtersMapper;
     expect(charachtersMapper[0].alphabetCharachters).toBe('نو');
@@ -122,6 +137,8 @@ describe('LiteralTranslationService', () => {
     const word = 'كتعنخنوكت';
     const charachtersMapper = service.fromArabicLettersToHieroglyphics(
       word,
+
+      GenderEnum.NONE,
       true,
     ).charachtersMapper;
     expect(charachtersMapper[0].alphabetCharachters).toBe('ك');
@@ -138,6 +155,7 @@ describe('LiteralTranslationService', () => {
     const word = 'نو ر';
     const charachtersMapper = service.fromArabicLettersToHieroglyphics(
       word,
+      GenderEnum.NONE,
       true,
     ).charachtersMapper;
     expect(charachtersMapper[0].alphabetCharachters).toBe('نو');
