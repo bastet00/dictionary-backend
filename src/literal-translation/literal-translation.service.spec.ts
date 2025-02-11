@@ -17,54 +17,67 @@ describe('LiteralTranslationService', () => {
   });
 
   it('should translate Arabic letters to hieroglyphics', () => {
-    const word = 'سلام';
+    const text = 'سلام';
     const expectedTranslation = '𓋴𓃭𓄿𓅓'; // Assuming these are the correct hieroglyphics
     expect(
-      service.fromArabicLettersToHieroglyphics(word, GenderEnum.NONE)
-        .literalTranslation,
+      service.fromArabicLettersToHieroglyphics(text).literalTranslation,
     ).toBe(expectedTranslation);
   });
 
   it('should translate Arabic name like Amro to hieroglyphics', () => {
-    const word = 'عمرو';
+    const text = 'عمرو';
     const expectedTranslation = '𓂝𓅓𓂋𓅱'; // Assuming these are the correct hieroglyphics
     expect(
-      service.fromArabicLettersToHieroglyphics(word, GenderEnum.NONE)
-        .literalTranslation,
+      service.fromArabicLettersToHieroglyphics(text).literalTranslation,
     ).toBe(expectedTranslation);
   });
 
-  it('should return the same word if no translation is found', () => {
-    const word = 'hello';
+  it('should add gender determinative at the end of male name', () => {
+    const text = 'عمرو';
+    const expectedTranslation = '𓂝𓅓𓂋𓅱𓀀'; // Assuming these are the correct hieroglyphics
     expect(
-      service.fromArabicLettersToHieroglyphics(word, GenderEnum.NONE)
-        .literalTranslation,
-    ).toBe(word);
+      service.fromArabicLettersToHieroglyphics(text, {
+        gender: GenderEnum.MALE,
+      }).literalTranslation,
+    ).toBe(expectedTranslation);
+  });
+
+  it('should add gender determinative at the end of male name', () => {
+    const text = 'نفرتيتي';
+    const expectedTranslation = '𓄤𓏏𓇌𓏏𓇌𓁐'; // Assuming these are the correct hieroglyphics
+    expect(
+      service.fromArabicLettersToHieroglyphics(text, {
+        multiSoundSymbol: true,
+        gender: GenderEnum.FEMALE,
+      }).literalTranslation,
+    ).toBe(expectedTranslation);
+  });
+
+  it('should return the same text if no translation is found', () => {
+    const text = 'hello';
+    expect(
+      service.fromArabicLettersToHieroglyphics(text).literalTranslation,
+    ).toBe(text);
   });
 
   it('should handle empty strings', () => {
-    const word = '';
+    const text = '';
     expect(
-      service.fromArabicLettersToHieroglyphics(word, GenderEnum.NONE)
-        .literalTranslation,
-    ).toBe(word);
+      service.fromArabicLettersToHieroglyphics(text).literalTranslation,
+    ).toBe(text);
   });
 
-  it('should return charachtersMapper with the same length as the word', () => {
-    const word = 'سلام';
-    const charachtersMapper = service.fromArabicLettersToHieroglyphics(
-      word,
-      GenderEnum.NONE,
-    ).charachtersMapper;
-    expect(charachtersMapper.length).toBe(word.length);
+  it('should return charachtersMapper with the same length as the text', () => {
+    const text = 'سلام';
+    const charachtersMapper =
+      service.fromArabicLettersToHieroglyphics(text).charachtersMapper;
+    expect(charachtersMapper.length).toBe(text.length);
   });
 
   it('should return charachtersMapper with array contains letters  and hieroglyphics', () => {
-    const word = 'سلام';
-    const charachtersMapper = service.fromArabicLettersToHieroglyphics(
-      word,
-      GenderEnum.NONE,
-    ).charachtersMapper;
+    const text = 'سلام';
+    const charachtersMapper =
+      service.fromArabicLettersToHieroglyphics(text).charachtersMapper;
     expect(charachtersMapper[0].alphabetCharachters).toBe('س');
     expect(charachtersMapper[1].alphabetCharachters).toBe('ل');
     expect(charachtersMapper[2].alphabetCharachters).toBe('ا');
@@ -77,36 +90,29 @@ describe('LiteralTranslationService', () => {
   });
 
   it('Should match single letter if no prefix founded', () => {
-    const word = 'نفرتيتي';
+    const text = 'نفرتيتي';
     const charachtersMapper = service.fromArabicLettersToHieroglyphics(
-      word,
-      GenderEnum.NONE,
-      true, // enable multi-sound query
+      text,
+      { multiSoundSymbol: true }, // enable multi-sound query
     ).charachtersMapper;
     expect(charachtersMapper[0].alphabetCharachters).toBe('نفر');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓄤');
   });
 
-  it('Should match entire word if a full match exists', () => {
-    const word = 'عنخ';
-    const charachtersMapper = service.fromArabicLettersToHieroglyphics(
-      word,
-
-      GenderEnum.NONE,
-      true,
-    ).charachtersMapper;
+  it('Should match entire text if a full match exists', () => {
+    const text = 'عنخ';
+    const charachtersMapper = service.fromArabicLettersToHieroglyphics(text, {
+      multiSoundSymbol: true,
+    }).charachtersMapper;
     expect(charachtersMapper[0].alphabetCharachters).toBe('عنخ');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓂀');
   });
 
   it('Should match signle letter at first, combine last three letters', () => {
-    const word = 'كتابعنخ';
-    const charachtersMapper = service.fromArabicLettersToHieroglyphics(
-      word,
-
-      GenderEnum.NONE,
-      true,
-    ).charachtersMapper;
+    const text = 'كتابعنخ';
+    const charachtersMapper = service.fromArabicLettersToHieroglyphics(text, {
+      multiSoundSymbol: true,
+    }).charachtersMapper;
     expect(charachtersMapper[0].alphabetCharachters).toBe('ك');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓎡');
     expect(charachtersMapper[1].alphabetCharachters).toBe('ت');
@@ -120,13 +126,10 @@ describe('LiteralTranslationService', () => {
   });
 
   it('Should match first two letters,single one at the end', () => {
-    const word = 'نور';
-    const charachtersMapper = service.fromArabicLettersToHieroglyphics(
-      word,
-
-      GenderEnum.NONE,
-      true,
-    ).charachtersMapper;
+    const text = 'نور';
+    const charachtersMapper = service.fromArabicLettersToHieroglyphics(text, {
+      multiSoundSymbol: true,
+    }).charachtersMapper;
     expect(charachtersMapper[0].alphabetCharachters).toBe('نو');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓌝');
     expect(charachtersMapper[1].alphabetCharachters).toBe('ر');
@@ -134,13 +137,10 @@ describe('LiteralTranslationService', () => {
   });
 
   it('should match 3,2,1 letters', () => {
-    const word = 'كتعنخنوكت';
-    const charachtersMapper = service.fromArabicLettersToHieroglyphics(
-      word,
-
-      GenderEnum.NONE,
-      true,
-    ).charachtersMapper;
+    const text = 'كتعنخنوكت';
+    const charachtersMapper = service.fromArabicLettersToHieroglyphics(text, {
+      multiSoundSymbol: true,
+    }).charachtersMapper;
     expect(charachtersMapper[0].alphabetCharachters).toBe('ك');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓎡');
     expect(charachtersMapper[1].alphabetCharachters).toBe('ت');
@@ -152,12 +152,10 @@ describe('LiteralTranslationService', () => {
   });
 
   it('should handle spaces between words', () => {
-    const word = 'نو ر';
-    const charachtersMapper = service.fromArabicLettersToHieroglyphics(
-      word,
-      GenderEnum.NONE,
-      true,
-    ).charachtersMapper;
+    const text = 'نو ر';
+    const charachtersMapper = service.fromArabicLettersToHieroglyphics(text, {
+      multiSoundSymbol: true,
+    }).charachtersMapper;
     expect(charachtersMapper[0].alphabetCharachters).toBe('نو');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓌝');
     expect(charachtersMapper[1].alphabetCharachters).toBe('ر');

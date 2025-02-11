@@ -18,14 +18,14 @@ export class LiteralTranslationController {
   @Get()
   fromArabicLettersToHieroglyphics(
     @Query('text') text: string,
-    @Query('gender', new ParseEnumPipe(GenderEnum)) gender: GenderEnum,
-    @Query('multipleSoundSymbol', new ParseBoolPipe())
-    mutliSoundSymbol?: boolean,
+    @Query('gender', new ParseEnumPipe(GenderEnum, { optional: true }))
+    gender: GenderEnum,
+    @Query('multiSoundSymbol', new ParseBoolPipe({ optional: true }))
+    multiSoundSymbol?: boolean,
   ): LiteralTranslationResultsDto {
     return this.literalTranslationService.fromArabicLettersToHieroglyphics(
       text,
-      gender,
-      mutliSoundSymbol,
+      { multiSoundSymbol, gender },
     );
   }
 }
