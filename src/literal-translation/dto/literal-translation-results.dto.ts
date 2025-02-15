@@ -1,8 +1,8 @@
-export type CharachtersMapper = {
+export type LettersMapper = {
+  alphabetLetters: string;
   hieroglyphics: string;
-  alphabetCharachters: string;
-}[];
+};
 export type LiteralTranslationResultsDto = {
   literalTranslation: string;
-  charachtersMapper: CharachtersMapper;
+  lettersMapper: LettersMapper[];
 };

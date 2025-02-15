@@ -1,5 +1,9 @@
 export enum GenderEnum {
   MALE = 'MALE',
   FEMALE = 'FEMALE',
-  PLURAL = 'PLURAL',
+}
+
+export enum HieroglyphicsEnum {
+  MALE = '𓀀',
+  FEMALE = '𓁐',
 }

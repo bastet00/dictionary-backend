@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { arabicToHieroglyphics } from './mappers/arabicToHieroglyphics';
 import {
-  CharachtersMapper,
+  LettersMapper,
   LiteralTranslationResultsDto,
 } from './dto/literal-translation-results.dto';
-import { GenderEnum } from './dto/gender.enum';
+import { GenderEnum, HieroglyphicsEnum } from './dto/gender.enum';
 
 @Injectable()
 export class LiteralTranslationService {
@@ -16,12 +16,12 @@ export class LiteralTranslationService {
     */
   fromArabicLettersToHieroglyphics(
     text: string,
-    options: { multiSoundSymbol?: boolean; gender?: GenderEnum } = {},
+    options: { useMultiLetterSymbols?: boolean; gender?: GenderEnum } = {},
   ): LiteralTranslationResultsDto {
-    const { multiSoundSymbol, gender } = options;
+    const { useMultiLetterSymbols, gender } = options;
     text = text.replaceAll(' ', '');
-    const charachtersMapper: CharachtersMapper = [];
-    const prefixLength = multiSoundSymbol ? 3 : 1;
+    const lettersMapper: LettersMapper[] = [];
+    const prefixLength = useMultiLetterSymbols ? 3 : 1;
     let literalTranslation = '';
     let start = 0;
     let end = prefixLength;
@@ -36,8 +36,8 @@ export class LiteralTranslationService {
         break;
       }
 
-      charachtersMapper.push({
-        alphabetCharachters: match,
+      lettersMapper.push({
+        alphabetLetters: match,
         hieroglyphics: foundedObj[match],
       });
       literalTranslation += foundedObj[match];
@@ -49,22 +49,18 @@ export class LiteralTranslationService {
       }
     }
 
-    literalTranslation = this.appendGenderSymbol(gender, literalTranslation);
+    if (gender) {
+      literalTranslation = this.appendGenderSymbol(gender, literalTranslation);
+    }
 
     return {
       literalTranslation,
-      charachtersMapper,
+      lettersMapper,
     };
   }
 
   private appendGenderSymbol(gender: GenderEnum, literalTranslation: string) {
-    if (gender === GenderEnum.MALE) {
-      literalTranslation += '𓀀';
-    }
-    if (gender === GenderEnum.FEMALE) {
-      literalTranslation += '𓁐';
-    }
-    return literalTranslation;
+    return literalTranslation + HieroglyphicsEnum[gender];
   }
 
   /**

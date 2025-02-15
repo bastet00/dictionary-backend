@@ -1,4 +1,5 @@
 export const arabicToHieroglyphics: { [key: string]: string } = {
+  أ: '𓄿',
   ا: '𓄿',
   إ: '𓇋',
   ي: '𓇌',
@@ -7,6 +8,7 @@ export const arabicToHieroglyphics: { [key: string]: string } = {
   پ: '𓊪',
   ع: '𓂝',
   ت: '𓏏',
+  ة: '𓏏',
   ط: '𓏏', // close alternative
   ث: '𓍿',
   م: '𓅓',

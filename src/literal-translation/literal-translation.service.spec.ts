@@ -47,7 +47,7 @@ describe('LiteralTranslationService', () => {
     const expectedTranslation = '𓄤𓏏𓇌𓏏𓇌𓁐'; // Assuming these are the correct hieroglyphics
     expect(
       service.fromArabicLettersToHieroglyphics(text, {
-        multiSoundSymbol: true,
+        useMultiLetterSymbols: true,
         gender: GenderEnum.FEMALE,
       }).literalTranslation,
     ).toBe(expectedTranslation);
@@ -70,18 +70,18 @@ describe('LiteralTranslationService', () => {
   it('should return charachtersMapper with the same length as the text', () => {
     const text = 'سلام';
     const charachtersMapper =
-      service.fromArabicLettersToHieroglyphics(text).charachtersMapper;
+      service.fromArabicLettersToHieroglyphics(text).lettersMapper;
     expect(charachtersMapper.length).toBe(text.length);
   });
 
   it('should return charachtersMapper with array contains letters  and hieroglyphics', () => {
     const text = 'سلام';
     const charachtersMapper =
-      service.fromArabicLettersToHieroglyphics(text).charachtersMapper;
-    expect(charachtersMapper[0].alphabetCharachters).toBe('س');
-    expect(charachtersMapper[1].alphabetCharachters).toBe('ل');
-    expect(charachtersMapper[2].alphabetCharachters).toBe('ا');
-    expect(charachtersMapper[3].alphabetCharachters).toBe('م');
+      service.fromArabicLettersToHieroglyphics(text).lettersMapper;
+    expect(charachtersMapper[0].alphabetLetters).toBe('س');
+    expect(charachtersMapper[1].alphabetLetters).toBe('ل');
+    expect(charachtersMapper[2].alphabetLetters).toBe('ا');
+    expect(charachtersMapper[3].alphabetLetters).toBe('م');
     // Assuming these are the correct hieroglyphics
     expect(charachtersMapper[0].hieroglyphics).toBe('𓋴');
     expect(charachtersMapper[1].hieroglyphics).toBe('𓃭');
@@ -93,72 +93,72 @@ describe('LiteralTranslationService', () => {
     const text = 'نفرتيتي';
     const charachtersMapper = service.fromArabicLettersToHieroglyphics(
       text,
-      { multiSoundSymbol: true }, // enable multi-sound query
-    ).charachtersMapper;
-    expect(charachtersMapper[0].alphabetCharachters).toBe('نفر');
+      { useMultiLetterSymbols: true }, // enable multi-sound query
+    ).lettersMapper;
+    expect(charachtersMapper[0].alphabetLetters).toBe('نفر');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓄤');
   });
 
   it('Should match entire text if a full match exists', () => {
     const text = 'عنخ';
     const charachtersMapper = service.fromArabicLettersToHieroglyphics(text, {
-      multiSoundSymbol: true,
-    }).charachtersMapper;
-    expect(charachtersMapper[0].alphabetCharachters).toBe('عنخ');
+      useMultiLetterSymbols: true,
+    }).lettersMapper;
+    expect(charachtersMapper[0].alphabetLetters).toBe('عنخ');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓂀');
   });
 
   it('Should match signle letter at first, combine last three letters', () => {
     const text = 'كتابعنخ';
     const charachtersMapper = service.fromArabicLettersToHieroglyphics(text, {
-      multiSoundSymbol: true,
-    }).charachtersMapper;
-    expect(charachtersMapper[0].alphabetCharachters).toBe('ك');
+      useMultiLetterSymbols: true,
+    }).lettersMapper;
+    expect(charachtersMapper[0].alphabetLetters).toBe('ك');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓎡');
-    expect(charachtersMapper[1].alphabetCharachters).toBe('ت');
+    expect(charachtersMapper[1].alphabetLetters).toBe('ت');
     expect(charachtersMapper[1].hieroglyphics).toBe('𓏏');
-    expect(charachtersMapper[2].alphabetCharachters).toBe('ا');
+    expect(charachtersMapper[2].alphabetLetters).toBe('ا');
     expect(charachtersMapper[2].hieroglyphics).toBe('𓄿');
-    expect(charachtersMapper[3].alphabetCharachters).toBe('ب');
+    expect(charachtersMapper[3].alphabetLetters).toBe('ب');
     expect(charachtersMapper[3].hieroglyphics).toBe('𓃀');
-    expect(charachtersMapper[4].alphabetCharachters).toBe('عنخ');
+    expect(charachtersMapper[4].alphabetLetters).toBe('عنخ');
     expect(charachtersMapper[4].hieroglyphics).toBe('𓂀');
   });
 
   it('Should match first two letters,single one at the end', () => {
     const text = 'نور';
     const charachtersMapper = service.fromArabicLettersToHieroglyphics(text, {
-      multiSoundSymbol: true,
-    }).charachtersMapper;
-    expect(charachtersMapper[0].alphabetCharachters).toBe('نو');
+      useMultiLetterSymbols: true,
+    }).lettersMapper;
+    expect(charachtersMapper[0].alphabetLetters).toBe('نو');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓌝');
-    expect(charachtersMapper[1].alphabetCharachters).toBe('ر');
+    expect(charachtersMapper[1].alphabetLetters).toBe('ر');
     expect(charachtersMapper[1].hieroglyphics).toBe('𓂋');
   });
 
   it('should match 3,2,1 letters', () => {
     const text = 'كتعنخنوكت';
     const charachtersMapper = service.fromArabicLettersToHieroglyphics(text, {
-      multiSoundSymbol: true,
-    }).charachtersMapper;
-    expect(charachtersMapper[0].alphabetCharachters).toBe('ك');
+      useMultiLetterSymbols: true,
+    }).lettersMapper;
+    expect(charachtersMapper[0].alphabetLetters).toBe('ك');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓎡');
-    expect(charachtersMapper[1].alphabetCharachters).toBe('ت');
+    expect(charachtersMapper[1].alphabetLetters).toBe('ت');
     expect(charachtersMapper[1].hieroglyphics).toBe('𓏏');
-    expect(charachtersMapper[2].alphabetCharachters).toBe('عنخ');
+    expect(charachtersMapper[2].alphabetLetters).toBe('عنخ');
     expect(charachtersMapper[2].hieroglyphics).toBe('𓂀');
-    expect(charachtersMapper[3].alphabetCharachters).toBe('نو');
+    expect(charachtersMapper[3].alphabetLetters).toBe('نو');
     expect(charachtersMapper[3].hieroglyphics).toBe('𓌝');
   });
 
   it('should handle spaces between words', () => {
     const text = 'نو ر';
     const charachtersMapper = service.fromArabicLettersToHieroglyphics(text, {
-      multiSoundSymbol: true,
-    }).charachtersMapper;
-    expect(charachtersMapper[0].alphabetCharachters).toBe('نو');
+      useMultiLetterSymbols: true,
+    }).lettersMapper;
+    expect(charachtersMapper[0].alphabetLetters).toBe('نو');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓌝');
-    expect(charachtersMapper[1].alphabetCharachters).toBe('ر');
+    expect(charachtersMapper[1].alphabetLetters).toBe('ر');
     expect(charachtersMapper[1].hieroglyphics).toBe('𓂋');
   });
 });

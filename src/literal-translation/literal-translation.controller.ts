@@ -20,12 +20,12 @@ export class LiteralTranslationController {
     @Query('text') text: string,
     @Query('gender', new ParseEnumPipe(GenderEnum, { optional: true }))
     gender: GenderEnum,
-    @Query('multiSoundSymbol', new ParseBoolPipe({ optional: true }))
-    multiSoundSymbol?: boolean,
+    @Query('useMultiLetterSymbols', new ParseBoolPipe({ optional: true }))
+    useMultiLetterSymbols?: boolean,
   ): LiteralTranslationResultsDto {
     return this.literalTranslationService.fromArabicLettersToHieroglyphics(
       text,
-      { multiSoundSymbol, gender },
+      { useMultiLetterSymbols, gender },
     );
   }
 }
