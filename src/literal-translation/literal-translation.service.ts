@@ -28,12 +28,16 @@ export class LiteralTranslationService {
 
     while (start < end) {
       const prefix = text.slice(start, end);
+      if (!prefix) {
+        break;
+      }
+
       const { foundedObj, stopAt } = this.longestFoundPrefix(prefix);
-      const match = Object.keys(foundedObj)[0];
+      let match = Object.keys(foundedObj)[0];
 
       if (!match) {
-        literalTranslation = text;
-        break;
+        match = prefix[0];
+        foundedObj[match] = match;
       }
 
       lettersMapper.push({
