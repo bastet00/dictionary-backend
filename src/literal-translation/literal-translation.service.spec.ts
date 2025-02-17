@@ -161,4 +161,12 @@ describe('LiteralTranslationService', () => {
     expect(charachtersMapper[1].alphabetLetters).toBe('ر');
     expect(charachtersMapper[1].hieroglyphics).toBe('𓂋');
   });
+
+  it('should parse special charachters to itself', () => {
+    const text = '!@#$%^&*()_-';
+    const charachtersMapper = service.fromArabicLettersToHieroglyphics(text, {
+      useMultiLetterSymbols: true,
+    }).literalTranslation;
+    expect(charachtersMapper).toBe(text);
+  });
 });

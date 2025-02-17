@@ -28,6 +28,7 @@ export class LiteralTranslationService {
 
     while (start < end) {
       const prefix = text.slice(start, end);
+
       if (!prefix) {
         break;
       }
