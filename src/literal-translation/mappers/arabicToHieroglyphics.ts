@@ -35,4 +35,5 @@ export const arabicToHieroglyphics: { [key: string]: string } = {
   نفر: '𓄤',
   عنخ: '𓂀',
   نو: '𓌝',
+  مر: '𓌻',
 };
