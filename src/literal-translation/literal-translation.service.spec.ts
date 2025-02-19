@@ -105,7 +105,7 @@ describe('LiteralTranslationService', () => {
       useMultiLetterSymbols: true,
     }).lettersMapper;
     expect(charachtersMapper[0].alphabetLetters).toBe('عنخ');
-    expect(charachtersMapper[0].hieroglyphics).toBe('𓂀');
+    expect(charachtersMapper[0].hieroglyphics).toBe('𓋹');
   });
 
   it('Should match signle letter at first, combine last three letters', () => {
@@ -117,12 +117,10 @@ describe('LiteralTranslationService', () => {
     expect(charachtersMapper[0].hieroglyphics).toBe('𓎡');
     expect(charachtersMapper[1].alphabetLetters).toBe('ت');
     expect(charachtersMapper[1].hieroglyphics).toBe('𓏏');
-    expect(charachtersMapper[2].alphabetLetters).toBe('ا');
-    expect(charachtersMapper[2].hieroglyphics).toBe('𓄿');
-    expect(charachtersMapper[3].alphabetLetters).toBe('ب');
-    expect(charachtersMapper[3].hieroglyphics).toBe('𓃀');
-    expect(charachtersMapper[4].alphabetLetters).toBe('عنخ');
-    expect(charachtersMapper[4].hieroglyphics).toBe('𓂀');
+    expect(charachtersMapper[2].alphabetLetters).toBe('اب');
+    expect(charachtersMapper[2].hieroglyphics).toBe('𓍋');
+    expect(charachtersMapper[3].alphabetLetters).toBe('عنخ');
+    expect(charachtersMapper[3].hieroglyphics).toBe('𓋹');
   });
 
   it('Should match first two letters,single one at the end', () => {
@@ -131,7 +129,7 @@ describe('LiteralTranslationService', () => {
       useMultiLetterSymbols: true,
     }).lettersMapper;
     expect(charachtersMapper[0].alphabetLetters).toBe('نو');
-    expect(charachtersMapper[0].hieroglyphics).toBe('𓌝');
+    expect(charachtersMapper[0].hieroglyphics).toBe('𓏌');
     expect(charachtersMapper[1].alphabetLetters).toBe('ر');
     expect(charachtersMapper[1].hieroglyphics).toBe('𓂋');
   });
@@ -146,9 +144,9 @@ describe('LiteralTranslationService', () => {
     expect(charachtersMapper[1].alphabetLetters).toBe('ت');
     expect(charachtersMapper[1].hieroglyphics).toBe('𓏏');
     expect(charachtersMapper[2].alphabetLetters).toBe('عنخ');
-    expect(charachtersMapper[2].hieroglyphics).toBe('𓂀');
+    expect(charachtersMapper[2].hieroglyphics).toBe('𓋹');
     expect(charachtersMapper[3].alphabetLetters).toBe('نو');
-    expect(charachtersMapper[3].hieroglyphics).toBe('𓌝');
+    expect(charachtersMapper[3].hieroglyphics).toBe('𓏌');
   });
 
   it('should handle spaces between words', () => {
@@ -157,7 +155,7 @@ describe('LiteralTranslationService', () => {
       useMultiLetterSymbols: true,
     }).lettersMapper;
     expect(charachtersMapper[0].alphabetLetters).toBe('نو');
-    expect(charachtersMapper[0].hieroglyphics).toBe('𓌝');
+    expect(charachtersMapper[0].hieroglyphics).toBe('𓏌');
     expect(charachtersMapper[1].alphabetLetters).toBe('ر');
     expect(charachtersMapper[1].hieroglyphics).toBe('𓂋');
   });
