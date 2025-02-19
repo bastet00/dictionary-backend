@@ -30,6 +30,7 @@ export const arabicToHieroglyphics: { [key: string]: string } = {
   ك: '𓎡',
   چ: '𓎼',
   د: '𓂧',
+  ذ: '𓂧', // close alternative
   ض: '𓂧', // close alternative
   ظ: '𓂧', // close alternative
   ج: '𓆓',
