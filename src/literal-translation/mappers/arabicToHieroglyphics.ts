@@ -5,6 +5,7 @@ export const arabicToHieroglyphics: { [key: string]: string } = {
   ي: '𓇌',
   ء: '𓇋',
   و: '𓅱',
+  ؤ: '𓅱𓄿',
   ب: '𓃀',
   پ: '𓊪',
   ع: '𓂝',
