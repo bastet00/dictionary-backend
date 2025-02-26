@@ -30,7 +30,6 @@ export class LiteralTranslationService {
       lang?: LiteralTransLanguageEnum;
     } = {},
   ): LiteralTranslationResultsDto {
-    text = text.replaceAll(' ', '');
     const { useMultiLetterSymbols, gender, lang } = options;
     const prefixRange = this.detectObjectSwapAndRange(
       lang,
@@ -64,12 +63,12 @@ export class LiteralTranslationService {
   private detectObjectSwapAndRange(
     lang: LiteralTransLanguageEnum,
     multiLetter: boolean,
-  ): number {
+  ) {
     const maxPrefixRange = 3;
     switch (lang) {
       case LiteralTransLanguageEnum.HIEROGLYPHICS:
         this.performSwapOnce();
-        return maxPrefixRange; // symbols might read more than 1 character
+        return maxPrefixRange;
       case LiteralTransLanguageEnum.ARABIC:
         return multiLetter ? maxPrefixRange : 1;
     }
@@ -84,11 +83,12 @@ export class LiteralTranslationService {
     let literalTranslation = '';
     let start = 0;
     let end = prefixRange;
-
     while (start < end) {
       const prefix = text.slice(start, end);
       const { foundedObj, stopAt } = this.longestFoundPrefix(prefix);
+
       let match = Object.keys(foundedObj)[0];
+
       if (!match) {
         match = prefix[0];
         foundedObj[match] = match;
@@ -125,6 +125,7 @@ export class LiteralTranslationService {
     stopAt: number;
   } {
     if (prefix.length === 0) return { foundedObj: {}, stopAt: 0 }; //safe
+
     const stopAt = prefix.length - 1;
     const foundedObj = {};
     foundedObj[prefix] = arabicToHieroglyphics[prefix];

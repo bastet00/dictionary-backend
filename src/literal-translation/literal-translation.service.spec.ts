@@ -165,8 +165,9 @@ describe('LiteralTranslationService', () => {
     }).lettersMapper;
     expect(charachtersMapper[0].alphabetLetters).toBe('نو');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓏌');
-    expect(charachtersMapper[1].alphabetLetters).toBe('ر');
-    expect(charachtersMapper[1].hieroglyphics).toBe('𓂋');
+    expect(charachtersMapper[1].hieroglyphics).toBe(' ');
+    expect(charachtersMapper[2].alphabetLetters).toBe('ر');
+    expect(charachtersMapper[2].hieroglyphics).toBe('𓂋');
   });
 
   it('should parse special charachters to itself', () => {
@@ -176,5 +177,28 @@ describe('LiteralTranslationService', () => {
       lang: LiteralTransLanguageEnum.ARABIC,
     }).literalTranslation;
     expect(charachtersMapper).toBe(text);
+  });
+
+  it('should translate from hiero to arabic', () => {
+    const text = '𓈙𓅓𓋴 𓄿𓃭𓊃𓈖𓄿𓏏𓇌';
+    const charachtersMapper = service.fromArabicLettersToHieroglyphics(text, {
+      lang: LiteralTransLanguageEnum.HIEROGLYPHICS,
+    }).literalTranslation;
+    expect(charachtersMapper).toBe('شمس ألزنأتي'); // ا -> أ
+  });
+
+  it('should return same amount of spaces', () => {
+    const text = '𓇌𓅱𓋴𓆑 𓃀𓇌𓎛𓃀 𓂧𓉻𓇋𓀀';
+
+    const charachtersMapper = service.fromArabicLettersToHieroglyphics(text, {
+      lang: LiteralTransLanguageEnum.HIEROGLYPHICS,
+    });
+    let spaces = 0;
+    charachtersMapper.lettersMapper.forEach((obj) => {
+      if (obj.alphabetLetters === ' ') {
+        spaces++;
+      }
+    });
+    expect(spaces).toEqual(2);
   });
 });
