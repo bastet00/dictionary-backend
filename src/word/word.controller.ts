@@ -41,7 +41,20 @@ export class WordController {
     language: LanguageEnum,
   ) {
     const lang = this.wordService.languageSecretSwitch(word, language);
+    if (lang === LanguageEnum.english) {
+      return this.wordService.vectorSimilaritySearch(lang, word);
+    }
     return this.wordService.searchAndSuggest(lang, word);
+  }
+
+  //TODO: rename to search with version
+  @Get('similarity-search')
+  similaritySearch(
+    @Query('text', new SanitizeSpecialCharsPipe()) text: string,
+    @Query('lang', new ParseEnumPipe(LanguageEnum, { optional: true }))
+    language: LanguageEnum = LanguageEnum.english,
+  ) {
+    return this.wordService.vectorSimilaritySearch(language, text);
   }
 
   @Get(':id')

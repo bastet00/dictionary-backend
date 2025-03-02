@@ -9,19 +9,19 @@ import { toHieroglyphicsSign } from 'src/dto/transformer';
 export class WordService {
   constructor(private readonly ravendbService: RavendbService) {}
 
-  private isLatin(text: string): boolean {
-    return [...text].some(
-      (char) => (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z'),
-    );
-  }
-
   languageSecretSwitch(word: string, lang: LanguageEnum): LanguageEnum {
     if (this.isLatin(word) && lang === LanguageEnum.arabic) {
       return LanguageEnum.english;
     } else return lang;
   }
 
-  searchPatterns(word: string) {
+  private isLatin(text: string): boolean {
+    return [...text].some(
+      (char) => (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z'),
+    );
+  }
+
+  private searchPatterns(word: string) {
     return `^\\b${word}\\b$`.trim().replace(/ا/g, '[اأإ]');
   }
 
@@ -69,6 +69,16 @@ export class WordService {
     return suggestions[`${lang}.word`].suggestions;
   }
 
+  async vectorSimilaritySearch(
+    lang: LanguageEnum = LanguageEnum.english,
+    text: string,
+  ): Promise<Word[]> {
+    const words = await this.ravendbService.queryViaHttp<Word[]>(
+      `from word where vector.search(embedding.text(${lang}.word), '${text}', 0.80) limit 20`,
+    );
+    return this.toDto(words);
+  }
+
   async search(lang: LanguageEnum, word: string): Promise<Word[]> {
     const session = this.ravendbService.session();
     let resFullTextSearch = await session
@@ -98,7 +108,7 @@ export class WordService {
     return this.toDto(searchResults);
   }
 
-  private toDto(res: Word[]): Word[] {
+  toDto(res: Word[]): Word[] {
     return res.map((word) => {
       return {
         id: word.id,

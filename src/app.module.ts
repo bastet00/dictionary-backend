@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { RavendbService } from './raven/raven.service';
 import { WordSuggestionModule } from './word-suggestion/word-suggestion.module';
 import { LoginModule } from './login/login.module';
 import { PrivacyPolicyModule } from './privacy-policy/privacy-policy.module';
@@ -28,7 +27,6 @@ import { LiteralTranslationModule } from './literal-translation/literal-translat
     LiteralTranslationModule,
   ],
   providers: [
-    RavendbService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
