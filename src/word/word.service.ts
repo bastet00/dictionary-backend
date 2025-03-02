@@ -74,7 +74,7 @@ export class WordService {
     text: string,
   ): Promise<Word[]> {
     const words = await this.ravendbService.queryViaHttp<Word[]>(
-      `from word where vector.search(embedding.text(${lang}.word), '${text}', 0.80) limit 20`,
+      `from word where vector.search(embedding.text(${lang}.word), '${text}', 0.80) limit 10`,
     );
     return this.toDto(words);
   }
@@ -111,7 +111,7 @@ export class WordService {
   toDto(res: Word[]): Word[] {
     return res.map((word) => {
       return {
-        id: word.id,
+        id: word.id ?? (word['@metadata'] ? word['@metadata']['@id'] : null),
         arabic: word.arabic,
         egyptian: word.egyptian,
         english: word.english,

@@ -9,6 +9,7 @@ export interface Word {
     hieroglyphics: string[];
   }[];
   english: { word: string }[];
+  '@metadata'?: { '@id': string };
 }
 
 export interface WordDetailDto extends Word {
@@ -20,3 +21,4 @@ export interface WordDetailDto extends Word {
     hieroglyphicSigns: string[];
   }[];
 }
+('');

@@ -31,7 +31,7 @@ export class WordController {
 
   /**
    * @param word the word to be translated
-   * @param language the language this word written in
+   * @param lang the language this word written in
    * @returns list of words that match the provided word
    */
   @Get('search')
