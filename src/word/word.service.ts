@@ -4,7 +4,7 @@ import { LanguageEnum } from '../dto/language.enum';
 import { BulkCreateWordDto, CreateWordDto } from '../dto/input/create-word.dto';
 import { Word, WordDetailDto } from '../raven/entities/word.entity';
 import { toHieroglyphicsSign } from 'src/dto/transformer';
-
+import * as translatte from 'translatte';
 @Injectable()
 export class WordService {
   constructor(private readonly ravendbService: RavendbService) {}
@@ -73,6 +73,17 @@ export class WordService {
     lang: LanguageEnum = LanguageEnum.english,
     text: string,
   ): Promise<Word[]> {
+    if (lang === LanguageEnum.arabic) {
+      const translationResult = await translatte(text, {
+        to: 'en',
+        from: 'arabic',
+      }).catch((err) => {
+        console.error(err);
+      });
+      text = translationResult.text;
+      console.log('translated text:', text);
+      lang = LanguageEnum.english;
+    }
     const words = await this.ravendbService.queryViaHttp<Word[]>(
       `from word where vector.search(embedding.text(${lang}.word), '${text}', 0.80) limit 10`,
     );

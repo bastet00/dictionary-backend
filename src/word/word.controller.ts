@@ -35,16 +35,16 @@ export class WordController {
    * @returns list of words that match the provided word
    */
   @Get('search')
-  search(
+  async search(
     @Query('word', new SanitizeSpecialCharsPipe()) word: string,
     @Query('lang', new ParseEnumPipe(LanguageEnum))
     language: LanguageEnum,
   ) {
     const lang = this.wordService.languageSecretSwitch(word, language);
-    if (lang === LanguageEnum.english) {
-      return this.wordService.vectorSimilaritySearch(lang, word);
-    }
-    return this.wordService.searchAndSuggest(lang, word);
+    // if (lang === LanguageEnum.english) {
+    return this.wordService.vectorSimilaritySearch(lang, word);
+    // }
+    // return this.wordService.searchAndSuggest(lang, word);
   }
 
   //TODO: rename to search with version
