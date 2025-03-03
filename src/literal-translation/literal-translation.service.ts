@@ -6,16 +6,29 @@ import {
 } from './dto/literal-translation-results.dto';
 import { GenderEnum, HieroglyphicsEnum } from './dto/gender.enum';
 import { LiteralTransLanguageEnum } from './dto/language.enum';
+import { getHeiroToArabicObject } from './mappers/heiroglyphicsToArabic';
+import { LiteralTranslationObjects } from './dto/literal-translation.dto';
 
-// NOTE: detect prefix range
-// NOTE: detect lang to swap object(object loaded, swapped once)
-// i have to learn write this word ( hieroglyphics )
 @Injectable()
 export class LiteralTranslationService {
-  alreadySwapped: boolean;
+  private translationObjects = {} as LiteralTranslationObjects;
+
   constructor() {
-    this.alreadySwapped = false;
+    this.cacheTranslationObject();
   }
+
+  private cacheTranslationObject() {
+    if (!this.translationObjects[LiteralTransLanguageEnum.HIEROGLYPHICS]) {
+      this.translationObjects[LiteralTransLanguageEnum.HIEROGLYPHICS] =
+        getHeiroToArabicObject();
+    }
+
+    if (!this.translationObjects[LiteralTransLanguageEnum.ARABIC]) {
+      this.translationObjects[LiteralTransLanguageEnum.ARABIC] =
+        arabicToHieroglyphics;
+    }
+  }
+
   /*
     * This service is responsible for providing a literal translation of
     a word from arabic letters to hieroglyphs.
@@ -39,25 +52,13 @@ export class LiteralTranslationService {
       text,
       prefixRange,
       gender,
+      lang,
     );
 
     return {
       literalTranslation,
       lettersMapper,
     };
-  }
-
-  private performSwapOnce(): void {
-    // perform an object swapping if not done before
-    if (!this.alreadySwapped) {
-      for (const [k, v] of Object.entries(arabicToHieroglyphics)) {
-        // avoid overwrite
-        if (!arabicToHieroglyphics[v]) {
-          arabicToHieroglyphics[v] = k;
-        }
-      }
-      this.alreadySwapped = true;
-    }
   }
 
   private detectObjectSwapAndRange(
@@ -67,7 +68,6 @@ export class LiteralTranslationService {
     const maxPrefixRange = 3;
     switch (lang) {
       case LiteralTransLanguageEnum.HIEROGLYPHICS:
-        this.performSwapOnce();
         return maxPrefixRange;
       case LiteralTransLanguageEnum.ARABIC:
         return multiLetter ? maxPrefixRange : 1;
@@ -78,6 +78,7 @@ export class LiteralTranslationService {
     text: string,
     prefixRange: number,
     gender: GenderEnum,
+    lang: LiteralTransLanguageEnum,
   ): LiteralTranslationResultsDto {
     const lettersMapper: LettersMapper[] = [];
     let literalTranslation = '';
@@ -85,8 +86,7 @@ export class LiteralTranslationService {
     let end = prefixRange;
     while (start < end) {
       const prefix = text.slice(start, end);
-      const { foundedObj, stopAt } = this.longestFoundPrefix(prefix);
-
+      const { foundedObj, stopAt } = this.longestFoundPrefix(prefix, lang);
       let match = Object.keys(foundedObj)[0];
 
       if (!match) {
@@ -120,7 +120,10 @@ export class LiteralTranslationService {
    *    foundedObj: An object with the longest found prefix mapped to its value
    *    `stopAt`: index which indicates where the match is found
    */
-  private longestFoundPrefix(prefix: string): {
+  private longestFoundPrefix(
+    prefix: string,
+    lang: LiteralTransLanguageEnum,
+  ): {
     foundedObj: object;
     stopAt: number;
   } {
@@ -128,10 +131,10 @@ export class LiteralTranslationService {
 
     const stopAt = prefix.length - 1;
     const foundedObj = {};
-    foundedObj[prefix] = arabicToHieroglyphics[prefix];
+    foundedObj[prefix] = this.translationObjects[lang][prefix];
 
     if (!foundedObj[prefix]) {
-      return this.longestFoundPrefix(prefix.slice(0, stopAt));
+      return this.longestFoundPrefix(prefix.slice(0, stopAt), lang);
     }
 
     return { foundedObj, stopAt };
