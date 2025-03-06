@@ -5,35 +5,88 @@ import {
   LiteralTranslationResultsDto,
 } from './dto/literal-translation-results.dto';
 import { GenderEnum, HieroglyphicsEnum } from './dto/gender.enum';
+import { LiteralTransLanguageEnum } from './dto/language.enum';
+import { hieroglyphicsToArabic } from './mappers/heiroglyphicsToArabic';
 
 @Injectable()
 export class LiteralTranslationService {
   /*
     * This service is responsible for providing a literal translation of
-    a word from arabic letters to hieroglyphs.
+    a word from arabic letters to hieroglyphs and versal versa.
     * @param text - The text to translate
+    * @param useMultiLetterSymbols - use the multi letter matching
+    * @param gender - add gender symbol
     * @returns The literal translation of the word
     */
-  fromArabicLettersToHieroglyphics(
+
+  getLiteralTranslation(
     text: string,
-    options: { useMultiLetterSymbols?: boolean; gender?: GenderEnum } = {},
+    options: {
+      useMultiLetterSymbols?: boolean;
+      gender?: GenderEnum;
+      lang?: LiteralTransLanguageEnum;
+    } = {},
   ): LiteralTranslationResultsDto {
-    const { useMultiLetterSymbols, gender } = options;
-    text = text.replaceAll(' ', '');
+    const { useMultiLetterSymbols, gender, lang } = options;
+
+    if (!text) {
+      return {
+        literalTranslation: '',
+        lettersMapper: [],
+      };
+    }
+
+    const prefixRange = this.detectObjectSwapAndRange(
+      lang,
+      useMultiLetterSymbols,
+    );
+
+    const { lettersMapper, literalTranslation } = this.handleTranslation(
+      text,
+      prefixRange,
+      gender,
+      lang,
+    );
+
+    return {
+      literalTranslation,
+      lettersMapper,
+    };
+  }
+
+  private detectObjectSwapAndRange(
+    lang: LiteralTransLanguageEnum,
+    multiLetter: boolean,
+  ) {
+    const maxPrefixRange = 3;
+    switch (lang) {
+      case LiteralTransLanguageEnum.HIEROGLYPHICS:
+        return maxPrefixRange;
+      case LiteralTransLanguageEnum.ARABIC:
+        return multiLetter ? maxPrefixRange : 1;
+    }
+  }
+
+  private handleTranslation(
+    text: string,
+    prefixRange: number,
+    gender: GenderEnum,
+    lang: LiteralTransLanguageEnum,
+  ): LiteralTranslationResultsDto {
     const lettersMapper: LettersMapper[] = [];
-    const prefixLength = useMultiLetterSymbols ? 3 : 1;
     let literalTranslation = '';
     let start = 0;
-    let end = prefixLength;
-
+    let end = prefixRange;
+    const literalTranslationMapper =
+      lang === LiteralTransLanguageEnum.ARABIC
+        ? arabicToHieroglyphics
+        : hieroglyphicsToArabic;
     while (start < end) {
       const prefix = text.slice(start, end);
-
-      if (!prefix) {
-        break;
-      }
-
-      const { foundedObj, stopAt } = this.longestFoundPrefix(prefix);
+      const { foundedObj, stopAt } = this.longestFoundPrefix(
+        prefix,
+        literalTranslationMapper,
+      );
       let match = Object.keys(foundedObj)[0];
 
       if (!match) {
@@ -48,24 +101,18 @@ export class LiteralTranslationService {
       literalTranslation += foundedObj[match];
 
       start += stopAt + 1;
-      end = start + prefixLength;
+      end = start + prefixRange;
       if (end > text.length) {
         end = text.length;
       }
     }
 
-    if (gender) {
-      literalTranslation = this.appendGenderSymbol(gender, literalTranslation);
-    }
-
-    return {
-      literalTranslation,
-      lettersMapper,
-    };
+    literalTranslation += this.appendGenderSymbol(gender);
+    return { lettersMapper, literalTranslation };
   }
 
-  private appendGenderSymbol(gender: GenderEnum, literalTranslation: string) {
-    return literalTranslation + HieroglyphicsEnum[gender];
+  private appendGenderSymbol(gender: GenderEnum): string {
+    return gender ? HieroglyphicsEnum[gender] : '';
   }
 
   /**
@@ -73,16 +120,23 @@ export class LiteralTranslationService {
    *    foundedObj: An object with the longest found prefix mapped to its value
    *    `stopAt`: index which indicates where the match is found
    */
-  private longestFoundPrefix(prefix: string) {
+  private longestFoundPrefix(
+    prefix: string,
+    literalTranslationMapper: LiteralTranslationLangMapper,
+  ) {
     if (prefix.length === 0) return { foundedObj: {}, stopAt: 0 }; //safe
-    const stopAt = prefix.length - 1;
-    const foundedObj = {};
-    foundedObj[prefix] = arabicToHieroglyphics[prefix];
 
-    if (!foundedObj[prefix]) {
-      return this.longestFoundPrefix(prefix.slice(0, stopAt));
+    const stopAt = prefix.length - 1;
+    const longestFoundedPrefixMap = {};
+    longestFoundedPrefixMap[prefix] = literalTranslationMapper[prefix];
+
+    if (!longestFoundedPrefixMap[prefix]) {
+      return this.longestFoundPrefix(
+        prefix.slice(0, stopAt),
+        literalTranslationMapper,
+      );
     }
 
-    return { foundedObj, stopAt };
+    return { foundedObj: longestFoundedPrefixMap, stopAt };
   }
 }
