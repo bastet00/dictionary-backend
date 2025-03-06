@@ -30,9 +30,10 @@ export class LiteralTranslationController {
     )
     lang: LiteralTransLanguageEnum = LiteralTransLanguageEnum.ARABIC,
   ): LiteralTranslationResultsDto {
-    return this.literalTranslationService.fromArabicLettersToHieroglyphics(
-      text,
-      { useMultiLetterSymbols, gender, lang },
-    );
+    return this.literalTranslationService.getLiteralTranslation(text, {
+      useMultiLetterSymbols,
+      gender,
+      lang,
+    });
   }
 }

@@ -6,28 +6,11 @@ import {
 } from './dto/literal-translation-results.dto';
 import { GenderEnum, HieroglyphicsEnum } from './dto/gender.enum';
 import { LiteralTransLanguageEnum } from './dto/language.enum';
-import { getHeiroToArabicObject } from './mappers/heiroglyphicsToArabic';
-import { LiteralTranslationObjects } from './dto/literal-translation.dto';
+import { hieroglyphicsToArabic } from './mappers/heiroglyphicsToArabic';
 
 @Injectable()
 export class LiteralTranslationService {
-  private translationObjects = {} as LiteralTranslationObjects;
-
-  constructor() {
-    this.cacheTranslationObject();
-  }
-
-  private cacheTranslationObject() {
-    if (!this.translationObjects[LiteralTransLanguageEnum.HIEROGLYPHICS]) {
-      this.translationObjects[LiteralTransLanguageEnum.HIEROGLYPHICS] =
-        getHeiroToArabicObject();
-    }
-
-    if (!this.translationObjects[LiteralTransLanguageEnum.ARABIC]) {
-      this.translationObjects[LiteralTransLanguageEnum.ARABIC] =
-        arabicToHieroglyphics;
-    }
-  }
+  constructor() {}
 
   /*
     * This service is responsible for providing a literal translation of
@@ -35,7 +18,7 @@ export class LiteralTranslationService {
     * @param text - The text to translate
     * @returns The literal translation of the word
     */
-  fromArabicLettersToHieroglyphics(
+  getLiteralTranslation(
     text: string,
     options: {
       useMultiLetterSymbols?: boolean;
@@ -84,9 +67,16 @@ export class LiteralTranslationService {
     let literalTranslation = '';
     let start = 0;
     let end = prefixRange;
+    const literalTranslationMapper =
+      lang === LiteralTransLanguageEnum.ARABIC
+        ? arabicToHieroglyphics
+        : hieroglyphicsToArabic;
     while (start < end) {
       const prefix = text.slice(start, end);
-      const { foundedObj, stopAt } = this.longestFoundPrefix(prefix, lang);
+      const { foundedObj, stopAt } = this.longestFoundPrefix(
+        prefix,
+        literalTranslationMapper,
+      );
       let match = Object.keys(foundedObj)[0];
 
       if (!match) {
@@ -122,7 +112,7 @@ export class LiteralTranslationService {
    */
   private longestFoundPrefix(
     prefix: string,
-    lang: LiteralTransLanguageEnum,
+    literalTranslationMapper: LiteralTranslationLangMapper,
   ): {
     foundedObj: object;
     stopAt: number;
@@ -131,10 +121,13 @@ export class LiteralTranslationService {
 
     const stopAt = prefix.length - 1;
     const foundedObj = {};
-    foundedObj[prefix] = this.translationObjects[lang][prefix];
+    foundedObj[prefix] = literalTranslationMapper[prefix];
 
     if (!foundedObj[prefix]) {
-      return this.longestFoundPrefix(prefix.slice(0, stopAt), lang);
+      return this.longestFoundPrefix(
+        prefix.slice(0, stopAt),
+        literalTranslationMapper,
+      );
     }
 
     return { foundedObj, stopAt };

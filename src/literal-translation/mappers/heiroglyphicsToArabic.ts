@@ -1,6 +1,11 @@
 import { arabicToHieroglyphics } from './arabicToHieroglyphics';
 
-export function getHeiroToArabicObject() {
+export let hieroglyphicsToArabic = undefined;
+hieroglyphicsToArabic = hieroglyphicsToArabic
+  ? hieroglyphicsToArabic
+  : getHieroglyphicsToArabicMapper();
+
+function getHieroglyphicsToArabicMapper(): LiteralTranslationLangMapper {
   const swapped = {};
   for (const [k, v] of Object.entries(arabicToHieroglyphics)) {
     // avoid overwrite
