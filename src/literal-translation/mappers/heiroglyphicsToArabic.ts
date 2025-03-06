@@ -1,8 +1,8 @@
 import { arabicToHieroglyphics } from './arabicToHieroglyphics';
 
-export let hieroglyphicsToArabic = undefined;
-hieroglyphicsToArabic = hieroglyphicsToArabic
-  ? hieroglyphicsToArabic
+let cachedHieroglyphicsToArabic = undefined;
+export const hieroglyphicsToArabic = cachedHieroglyphicsToArabic
+  ? cachedHieroglyphicsToArabic
   : getHieroglyphicsToArabicMapper();
 
 function getHieroglyphicsToArabicMapper(): LiteralTranslationLangMapper {
@@ -13,5 +13,6 @@ function getHieroglyphicsToArabicMapper(): LiteralTranslationLangMapper {
       swapped[v] = k;
     }
   }
-  return swapped;
+  cachedHieroglyphicsToArabic = swapped;
+  return cachedHieroglyphicsToArabic;
 }
