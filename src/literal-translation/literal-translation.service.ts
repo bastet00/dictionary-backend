@@ -10,14 +10,15 @@ import { hieroglyphicsToArabic } from './mappers/heiroglyphicsToArabic';
 
 @Injectable()
 export class LiteralTranslationService {
-  constructor() {}
-
   /*
     * This service is responsible for providing a literal translation of
-    a word from arabic letters to hieroglyphs.
+    a word from arabic letters to hieroglyphs and versal versa.
     * @param text - The text to translate
+    * @param useMultiLetterSymbols - use the multi letter matching
+    * @param gender - add gender symbol
     * @returns The literal translation of the word
     */
+
   getLiteralTranslation(
     text: string,
     options: {
@@ -27,10 +28,19 @@ export class LiteralTranslationService {
     } = {},
   ): LiteralTranslationResultsDto {
     const { useMultiLetterSymbols, gender, lang } = options;
+
+    if (!text) {
+      return {
+        literalTranslation: '',
+        lettersMapper: [],
+      };
+    }
+
     const prefixRange = this.detectObjectSwapAndRange(
       lang,
       useMultiLetterSymbols,
     );
+
     const { lettersMapper, literalTranslation } = this.handleTranslation(
       text,
       prefixRange,
@@ -113,23 +123,20 @@ export class LiteralTranslationService {
   private longestFoundPrefix(
     prefix: string,
     literalTranslationMapper: LiteralTranslationLangMapper,
-  ): {
-    foundedObj: object;
-    stopAt: number;
-  } {
+  ) {
     if (prefix.length === 0) return { foundedObj: {}, stopAt: 0 }; //safe
 
     const stopAt = prefix.length - 1;
-    const foundedObj = {};
-    foundedObj[prefix] = literalTranslationMapper[prefix];
+    const longestFoundedPrefixMap = {};
+    longestFoundedPrefixMap[prefix] = literalTranslationMapper[prefix];
 
-    if (!foundedObj[prefix]) {
+    if (!longestFoundedPrefixMap[prefix]) {
       return this.longestFoundPrefix(
         prefix.slice(0, stopAt),
         literalTranslationMapper,
       );
     }
 
-    return { foundedObj, stopAt };
+    return { foundedObj: longestFoundedPrefixMap, stopAt };
   }
 }

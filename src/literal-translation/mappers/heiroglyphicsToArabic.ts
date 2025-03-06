@@ -9,6 +9,7 @@ function getHieroglyphicsToArabicMapper(): LiteralTranslationLangMapper {
   if (cachedHieroglyphicsToArabic) {
     return cachedHieroglyphicsToArabic;
   }
+
   cachedHieroglyphicsToArabic = {};
   for (const [k, v] of Object.entries(arabicToHieroglyphics)) {
     // avoid overwrite
