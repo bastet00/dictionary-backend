@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { RavendbService } from '../raven/raven.service';
 import { LanguageEnum } from '../dto/language.enum';
-import { BulkCreateWordDto, CreateWordDto } from '../dto/input/create-word.dto';
+import {
+  BulkCreateWordDto,
+  CreateWordDto,
+} from '../dto/input/word/create-word.dto';
 import { Word, WordDetailDto } from '../raven/entities/word.entity';
 import { toHieroglyphicsSign } from 'src/dto/transformer';
 

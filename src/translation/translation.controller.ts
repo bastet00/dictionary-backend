@@ -3,7 +3,7 @@ import { TranslationService } from './translation.service';
 import { SanitizeSpecialCharsPipe } from 'src/common/custom-pipes/sanitizeSymbolPipe';
 import { LanguageEnum } from 'src/dto/language.enum';
 
-@Controller('v1/translation')
+@Controller('api/v1/translation')
 export class TranslationController {
   constructor(private readonly translationService: TranslationService) {}
   @Get()

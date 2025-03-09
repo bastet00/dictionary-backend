@@ -6,7 +6,7 @@ import { RavenModule } from '../raven/raven.module';
 @Module({
   imports: [RavenModule],
   controllers: [WordController],
-  providers: [WordService],
   exports: [WordService],
+  providers: [WordService],
 })
 export class WordModule {}

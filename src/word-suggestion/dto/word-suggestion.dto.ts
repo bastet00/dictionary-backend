@@ -8,7 +8,7 @@ import {
   Length,
   ValidateNested,
 } from 'class-validator';
-import { EgyptianWordDto } from 'src/dto/input/create-word.dto';
+import { EgyptianWordDto } from 'src/dto/input/word/create-word.dto';
 import { Transform, Type } from 'class-transformer';
 import { toUTF32String } from 'src/dto/transformer';
 

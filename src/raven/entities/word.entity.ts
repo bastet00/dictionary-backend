@@ -21,4 +21,3 @@ export interface WordDetailDto extends Word {
     hieroglyphicSigns: string[];
   }[];
 }
-('');

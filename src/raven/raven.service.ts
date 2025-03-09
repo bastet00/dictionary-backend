@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import { firstValueFrom } from 'rxjs';
 import * as https from 'https';
 
+export type DocumentName = 'word' | 'sentence' | 'word-suggestion';
 @Injectable()
 export class RavendbService {
   DB_NAME = 'words';
@@ -32,7 +33,7 @@ export class RavendbService {
     return session;
   }
 
-  async saveToDb(payload: object, docName: string) {
+  async saveToDb(payload: object, docName: DocumentName) {
     const db = this.session();
 
     await db.store(
