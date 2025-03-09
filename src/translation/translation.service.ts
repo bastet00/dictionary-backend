@@ -2,29 +2,50 @@ import { Injectable } from '@nestjs/common';
 import { LanguageEnum } from 'src/dto/language.enum';
 import { WordService } from 'src/word/word.service';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { Word } from 'src/raven/entities/word.entity';
+import { SentenceService } from './sentence.service';
+import { Sentence } from 'src/raven/entities/sentence.entity';
 
 @Injectable()
 export class TranslationService {
-  constructor(private readonly wordService: WordService) {}
+  constructor(
+    private readonly wordService: WordService,
+    private readonly sentenceService: SentenceService,
+  ) {}
 
   async translate(language: LanguageEnum, text: string) {
     const lang = this.wordService.languageSecretSwitch(text, language);
-    const dbResult = await this.wordService.searchAndSuggest(lang, text);
+    const dbVectorSearchResult =
+      await this.sentenceService.vectorSimilaritySearch(lang, text);
 
-    const prompt = this.preparePrompt(dbResult, lang, text);
+    const { header, footer, body } = this.preparePrompt(
+      dbVectorSearchResult,
+      lang,
+      text,
+    );
+    const prompt = header + body + footer;
+
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }); // reaplce model name
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const result = await model.generateContent([prompt]);
     console.log(prompt);
-    console.log(model);
+    console.log(result.response.text());
+
+    return {
+      prompt: prompt,
+      googleResponse: result.response.text(),
+    };
   }
 
-  private preparePrompt(dbResult: Word[], lang: LanguageEnum, text: string) {
-    let prompt = '';
-    prompt += this.getPromptHeader();
-    // TODO: handle arguments
-    prompt += this.getPromptFooter(text);
-    this.handleDifferentPromptArgs(dbResult, lang);
+  private preparePrompt(
+    dbResult: Sentence[],
+    lang: LanguageEnum,
+    text: string,
+  ) {
+    const prompt = {
+      header: this.getPromptHeader(),
+      body: this.getPromptBody(dbResult, lang),
+      footer: this.getPromptFooter(text),
+    };
     return prompt;
   }
 
@@ -36,27 +57,38 @@ export class TranslationService {
 
   private getPromptFooter(text: string): string {
     return `
-    Example Format:
-      - Ra on the front of: ra 𓇳 nxt 𓀜
-      - my name is amro -> rni Amro 𓀁
     Provide final result of translation with translation tag.
+    Answer only with translation write each word of the translation as a key and its value in array fist index is arabic and second is english.
     Translate the following sentence to ancient Egyptian: ${text}.
     `;
   }
 
-  private handleDifferentPromptArgs(
-    dbResult: Word[],
+  private getPromptBody(
+    dbResult: Sentence[],
     queryLangauge: LanguageEnum,
-  ) {
-    console.log(dbResult, queryLangauge);
-    const customizePrompt = `
-      - x1 from query -> x1 value from db +  𓀁
-      - x2 from query -> x2 value from db + symbol
-      - and so on
-      - (suffix prn.) I , me , my -> i𓀁
-      - I -> ink 𓀁
-      - home -> pr 𓉐
-`;
-    return customizePrompt;
+  ): string {
+    return dbResult
+      .map((sentece: Sentence) => {
+        return `- ${sentece[queryLangauge]} -> ${sentece.british}\n`;
+      })
+      .join('\n');
   }
+
+  // word
+  // private handleDifferentPromptArgs(
+  //   dbResult: Word[],
+  //   queryLangauge: LanguageEnum,
+  // ) {
+  //   const customizePrompt = dbResult
+  //     .map((word) => {
+  //       const egy = word.egyptian;
+  //       const targetLanguage = word[queryLangauge] as { word: string }[];
+  //       const unicode = egy[0].symbol;
+  //       const symbol = String.fromCodePoint(parseInt(unicode, 16));
+  //       return `- ${targetLanguage[0].word} -> ${egy[0].word} ${symbol}\n`;
+  //     })
+  //     .join('\n');
+  //   return customizePrompt;
+  // }
+  //
 }
