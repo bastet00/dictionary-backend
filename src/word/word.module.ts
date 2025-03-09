@@ -8,5 +8,6 @@ import { SentenceService } from './sentence.service';
   imports: [RavenModule],
   controllers: [WordController],
   providers: [WordService, SentenceService],
+  exports: [WordService],
 })
 export class WordModule {}
