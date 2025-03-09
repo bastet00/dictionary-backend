@@ -12,7 +12,10 @@ import {
 } from '@nestjs/common';
 import { WordService } from './word.service';
 import { LanguageEnum } from '../dto/language.enum';
-import { BulkCreateWordDto, CreateWordDto } from '../dto/input/create-word.dto';
+import {
+  BulkCreateWordDto,
+  CreateWordDto,
+} from '../dto/input/word/create-word.dto';
 import { SanitizeSpecialCharsPipe } from 'src/common/custom-pipes/sanitizeSymbolPipe';
 
 @UseInterceptors(ClassSerializerInterceptor)

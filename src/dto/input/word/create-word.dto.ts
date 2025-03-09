@@ -10,7 +10,7 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
-import { toUTF32String } from '../transformer/to-unicode';
+import { toUTF32String } from '../../transformer/to-unicode';
 
 export class WordDto {
   @IsNotEmpty()

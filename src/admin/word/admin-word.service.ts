@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CreateWordDto } from 'src/dto/input/create-word.dto';
-import { UpdateWordDto } from 'src/dto/input/update-word.dto';
+import { CreateWordDto } from 'src/dto/input/word/create-word.dto';
 import { RavendbService } from 'src/raven/raven.service';
+import { UpdateWordDto } from './dto/update-word.dto';
 
 @Injectable()
 export class AdminWordService {
