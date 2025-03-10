@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { LanguageEnum } from 'src/dto/language.enum';
-import { WordService } from 'src/word/word.service';
+import { LanguageEnum } from '../dto/language.enum';
+import { WordService } from '../word/word.service';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { SentenceService } from './sentence.service';
-import { Sentence } from 'src/raven/entities/sentence.entity';
+import { Sentence } from '../raven/entities/sentence.entity';
+import { Word, WordValue } from '../raven/entities/word.entity';
 
 @Injectable()
 export class TranslationService {
@@ -14,15 +15,18 @@ export class TranslationService {
 
   async translate(language: LanguageEnum, text: string) {
     const lang = this.wordService.languageSecretSwitch(text, language);
-    const dbVectorSearchResult =
-      await this.sentenceService.vectorSimilaritySearch(lang, text);
-
-    const { header, footer, body } = this.preparePrompt(
-      dbVectorSearchResult,
+    const sentences = await this.sentenceService.vectorSimilaritySearch(
       lang,
       text,
     );
-    const prompt = header + body + footer;
+    const words = await this.wordService.vectorSimilaritySearch(lang, text);
+    const { system, contextLearning, question } = this.preparePrompt(
+      sentences,
+      words,
+      lang,
+      text,
+    );
+    const prompt = system + contextLearning + question;
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
@@ -37,41 +41,51 @@ export class TranslationService {
   }
 
   private preparePrompt(
-    dbResult: Sentence[],
+    sentences: Sentence[],
+    words: Word[],
     lang: LanguageEnum,
     text: string,
   ) {
     const prompt = {
-      header: this.getPromptHeader(),
-      body: this.getPromptBody(dbResult, lang),
-      footer: this.getPromptFooter(text),
+      system: this.getSystemPrompt(),
+      contextLearning: this.getContextLearningPrompt(sentences, words, lang),
+      question: this.getQuestionPrompt(text),
     };
     return prompt;
   }
 
-  private getPromptHeader(): string {
+  private getSystemPrompt(): string {
     return `You are an Egyptologist translating English to ancient Egyptian.
             Use the following translations as a reference (template: [word -> transiliteriation determinative]):
     `;
   }
 
-  private getPromptFooter(text: string): string {
+  private getQuestionPrompt(text: string): string {
     return `
     Provide final result of translation with translation tag.
-    Answer only with translation write each word of the translation as a key and its value in array fist index is arabic and second is english.
+    Answer only with the translation.
+    If you were not provided vocabulary, answer with: "No translation found".
     Translate the following sentence to ancient Egyptian: ${text}.
     `;
   }
 
-  private getPromptBody(
-    dbResult: Sentence[],
-    queryLangauge: LanguageEnum,
+  private getContextLearningPrompt(
+    sentences: Sentence[],
+    words: Word[],
+    queryLanguage: LanguageEnum,
   ): string {
-    return dbResult
-      .map((sentece: Sentence) => {
-        return `- ${sentece[queryLangauge]} -> ${sentece.british}\n`;
-      })
-      .join('\n');
+    return (
+      sentences
+        .map((sentence: Sentence) => {
+          return `- ${sentence[queryLanguage]} -> ${sentence.transliteration}\n`;
+        })
+        .join('\n') +
+      words
+        .map((word: Word) => {
+          return `- ${word[queryLanguage].map((wordValue: WordValue) => wordValue.word).join(',')} -> ${word.egyptian[0].transliteration}\n`;
+        })
+        .join('\n')
+    );
   }
 
   // word

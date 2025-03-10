@@ -1,14 +1,15 @@
+export type WordValue = { word: string };
 export interface Word {
   id: string;
   resources?: string[];
-  arabic: { word: string }[];
+  arabic: WordValue[];
   egyptian: {
     word: string;
     unicode: string;
     transliteration: string;
     hieroglyphics: string[];
   }[];
-  english: { word: string }[];
+  english: WordValue[];
   '@metadata'?: { '@id': string };
 }
 
