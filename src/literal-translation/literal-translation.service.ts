@@ -60,9 +60,9 @@ export class LiteralTranslationService {
   ) {
     const maxPrefixRange = 3;
     switch (lang) {
-      case LiteralTransLanguageEnum.HIEROGLYPHICS:
+      case LiteralTransLanguageEnum.egyptian:
         return maxPrefixRange;
-      case LiteralTransLanguageEnum.ARABIC:
+      case LiteralTransLanguageEnum.arabic:
         return multiLetter ? maxPrefixRange : 1;
     }
   }
@@ -78,7 +78,7 @@ export class LiteralTranslationService {
     let start = 0;
     let end = prefixRange;
     const literalTranslationMapper =
-      lang === LiteralTransLanguageEnum.ARABIC
+      lang === LiteralTransLanguageEnum.arabic
         ? arabicToHieroglyphics
         : hieroglyphicsToArabic;
     while (start < end) {
