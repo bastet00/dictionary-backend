@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   ParseEnumPipe,
+  Post,
   Put,
   Query,
   UseGuards,
@@ -15,6 +16,7 @@ import { LanguageEnum } from 'src/dto/language.enum';
 import { LoginGuard } from 'src/common/guards/login.guard';
 import { DefaultMinMaxValue } from 'src/common/custom-decorators/NumericalOrDefault';
 import { UpdateWordDto } from './dto/update-word.dto';
+import { CreateWordDto } from 'src/dto/input/word/create-word.dto';
 
 @Controller('admin/word')
 export class AdminWordController {
@@ -35,6 +37,12 @@ export class AdminWordController {
     lang: LanguageEnum,
   ) {
     return this.adminService.search(page, perPage, word, lang);
+  }
+
+  @Post()
+  @UseGuards(LoginGuard)
+  create(createWordDto: CreateWordDto) {
+    return this.adminService.create(createWordDto);
   }
 
   @Delete(':id')
