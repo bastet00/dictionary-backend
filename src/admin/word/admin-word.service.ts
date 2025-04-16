@@ -36,6 +36,10 @@ export class AdminWordService {
     };
   }
 
+  create(createWordDto: CreateWordDto) {
+    return this.ravendbService.saveToDb(createWordDto, 'word');
+  }
+
   async delete(id: string) {
     const session = this.ravendbService.session();
     await session.delete(id);
