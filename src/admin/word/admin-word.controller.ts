@@ -41,7 +41,7 @@ export class AdminWordController {
 
   @Post()
   @UseGuards(LoginGuard)
-  create(createWordDto: CreateWordDto) {
+  create(@Body() createWordDto: CreateWordDto) {
     return this.adminService.create(createWordDto);
   }
 

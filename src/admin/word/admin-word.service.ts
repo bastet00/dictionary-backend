@@ -37,7 +37,7 @@ export class AdminWordService {
   }
 
   create(createWordDto: CreateWordDto) {
-    this.ravendbService.saveToDb(createWordDto, 'word');
+    return this.ravendbService.saveToDb(createWordDto, 'word');
   }
 
   async delete(id: string) {
