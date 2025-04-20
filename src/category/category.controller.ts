@@ -1,6 +1,5 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { CategoryDto } from './dto/category.dto';
 
 @Controller('api/category')
 export class CategoryController {
@@ -9,12 +8,5 @@ export class CategoryController {
   @Get()
   getCategory() {
     return this.categoryService.getCategory();
-  }
-
-  // NOTE: Testing category dto
-  @Post()
-  addCategory(@Body() category: CategoryDto) {
-    console.log(category);
-    return 'Hello';
   }
 }

@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import { firstValueFrom } from 'rxjs';
 import * as https from 'https';
 
-export type DocumentName = 'word' | 'sentence' | 'word-suggestion';
+export type DocumentName = 'word' | 'sentence' | 'word-suggestion' | 'Example';
 @Injectable()
 export class RavendbService {
   DB_NAME = 'words';
