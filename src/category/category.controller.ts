@@ -7,6 +7,6 @@ export class CategoryController {
 
   @Get()
   getCategory() {
-    return 'Hello world';
+    return this.categoryService.getCategory();
   }
 }
