@@ -149,4 +149,10 @@ export class WordService {
       ],
     };
   }
+
+  async addWordDev(createWordDto: CreateWordDto) {
+    console.log(createWordDto);
+
+    return 'hello';
+  }
 }

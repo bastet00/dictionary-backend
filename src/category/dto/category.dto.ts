@@ -1,8 +1,8 @@
 import { IsArray, IsEnum } from 'class-validator';
 import { CategoryEnum } from './category.enum';
 
-export class Category {
+export class CategoryDto {
   @IsArray()
   @IsEnum(CategoryEnum, { each: true })
-  category: string[];
+  category: string[] = [];
 }

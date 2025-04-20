@@ -11,6 +11,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { toUTF32String } from '../../transformer/to-unicode';
+import { CategoryDto } from 'src/category/dto/category.dto';
 
 export class WordDto {
   @IsNotEmpty()
@@ -75,6 +76,8 @@ export class CreateWordDto {
   @Type(() => EgyptianWordDto)
   @ValidateNested({ each: true })
   egyptian: EgyptianWordDto[];
+
+  category: CategoryDto;
 }
 
 export class BulkCreateWordDto {
