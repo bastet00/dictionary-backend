@@ -151,10 +151,7 @@ export class WordService {
   }
 
   async addWordDev(createWordDto: CreateWordDto) {
-    console.clear();
-    console.log(createWordDto);
-
-    // this.ravendbService.saveToDb(createWordDto, 'Example');
+    this.ravendbService.saveToDb(createWordDto, 'Example');
     return 'hello';
   }
 }
