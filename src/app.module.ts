@@ -10,6 +10,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { LiteralTranslationModule } from './literal-translation/literal-translation.module';
 import { TranslationModule } from './translation/translation.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { TranslationModule } from './translation/translation.module';
     WordModule,
     LiteralTranslationModule,
     TranslationModule,
+    CategoryModule,
   ],
   providers: [
     {
