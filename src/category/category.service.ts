@@ -9,7 +9,7 @@ export class CategoryService {
 
   getCategory() {
     return {
-      categories: this.categoryEnumAsArray(),
+      category: this.categoryEnumAsArray(),
     };
   }
 }
