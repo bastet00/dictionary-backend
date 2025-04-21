@@ -80,7 +80,7 @@ export class CreateWordDto {
 
   @IsArray()
   @IsEnum(CategoryEnum, { each: true })
-  category: string[] = []; // default value
+  category: string[] = [];
 }
 
 export class BulkCreateWordDto {

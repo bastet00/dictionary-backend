@@ -74,9 +74,4 @@ export class WordController {
   createBulk(@Body() createWordDto: BulkCreateWordDto) {
     return this.wordService.createBulk(createWordDto);
   }
-
-  @Post('dev')
-  testNewCategory(@Body() createWordDto: CreateWordDto) {
-    return this.wordService.addWordDev(createWordDto);
-  }
 }

@@ -149,9 +149,4 @@ export class WordService {
       ],
     };
   }
-
-  async addWordDev(createWordDto: CreateWordDto) {
-    this.ravendbService.saveToDb(createWordDto, 'Example');
-    return 'hello';
-  }
 }
