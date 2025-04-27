@@ -61,7 +61,7 @@ export class AdminWordService {
 
   private addWordToEgyptianObject(createWordDto: CreateWordDto) {
     for (const egyptian of createWordDto.egyptian) {
-      if (!egyptian.word) {
+      if (!egyptian.word && egyptian.transliteration) {
         egyptian.word = fromTransliterationToEgyptian({
           value: egyptian.transliteration,
         });
