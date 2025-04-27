@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateWordDto } from 'src/dto/input/word/create-word.dto';
 import { RavendbService } from 'src/raven/raven.service';
 import { UpdateWordDto } from './dto/update-word.dto';
+import { fromTransliterationToEgyptian } from 'src/dto/transformer/to-egyptian/from-transliteration-to-egyptian';
 
 @Injectable()
 export class AdminWordService {
@@ -37,6 +38,7 @@ export class AdminWordService {
   }
 
   create(createWordDto: CreateWordDto) {
+    createWordDto = this.addWordToEgyptianObject(createWordDto);
     return this.ravendbService.saveToDb(createWordDto, 'word');
   }
 
@@ -55,5 +57,16 @@ export class AdminWordService {
     doc.english = updateWordDto.english ? updateWordDto.english : doc.english;
     await session.saveChanges();
     return doc;
+  }
+
+  private addWordToEgyptianObject(createWordDto: CreateWordDto) {
+    for (const egyptian of createWordDto.egyptian) {
+      if (!egyptian.word) {
+        egyptian.word = fromTransliterationToEgyptian({
+          value: egyptian.transliteration,
+        });
+      }
+    }
+    return createWordDto;
   }
 }

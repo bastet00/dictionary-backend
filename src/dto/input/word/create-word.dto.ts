@@ -11,7 +11,7 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
-import { toUTF32String } from '../../transformer/to-unicode';
+import { toUTF32String } from '../../transformer/to-unicode/to-unicode';
 import { CategoryEnum } from 'src/category/dto/category.enum';
 
 export class WordDto {
@@ -21,13 +21,12 @@ export class WordDto {
 }
 
 export class EgyptianWordDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MaxLength(500)
   word: string;
 
   @IsString()
-  @IsOptional()
   @MaxLength(500)
   transliteration: string;
 
