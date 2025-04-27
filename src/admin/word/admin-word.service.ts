@@ -38,7 +38,7 @@ export class AdminWordService {
   }
 
   create(createWordDto: CreateWordDto) {
-    createWordDto = this.addWordToEgyptianObject(createWordDto);
+    createWordDto = this.addWordToEgyptianDto(createWordDto);
     return this.ravendbService.saveToDb(createWordDto, 'word');
   }
 
@@ -59,7 +59,7 @@ export class AdminWordService {
     return doc;
   }
 
-  private addWordToEgyptianObject(createWordDto: CreateWordDto) {
+  private addWordToEgyptianDto(createWordDto: CreateWordDto) {
     for (const egyptian of createWordDto.egyptian) {
       if (!egyptian.word) {
         egyptian.word = fromTransliterationToEgyptian({
