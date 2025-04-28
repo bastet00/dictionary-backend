@@ -22,7 +22,7 @@ export class AdminWordService {
     const total = await this.query(skip, lang, word).count();
     const totalPages = Math.ceil(total / perPage);
     const res = await this.query(skip, lang, word)
-      .selectFields(['id', 'arabic', 'english', 'egyptian'])
+      .selectFields(['id', 'arabic', 'english', 'egyptian', 'category'])
       .take(perPage)
       .orderByScore()
       .all();
@@ -53,6 +53,10 @@ export class AdminWordService {
     doc.egyptian[0].symbol = updateWordDto.egyptian[0].symbol;
     doc.arabic = updateWordDto.arabic;
     doc.english = updateWordDto.english ? updateWordDto.english : doc.english;
+    doc.category = updateWordDto.category
+      ? updateWordDto.category
+      : doc.category;
+
     await session.saveChanges();
     return doc;
   }
