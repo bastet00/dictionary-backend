@@ -42,7 +42,7 @@ export class AdminWordService {
     createWordDto = this.addWordToEgyptianDto(createWordDto);
     const timeNow = new Date().toISOString();
     return this.ravendbService.saveToDb(
-      { createWordDto, createdAt: timeNow, updatedAt: timeNow },
+      { ...createWordDto, createdAt: timeNow, updatedAt: timeNow },
       'word',
     );
   }
