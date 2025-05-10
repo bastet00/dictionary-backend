@@ -11,7 +11,7 @@ export interface Word {
     hieroglyphics: string[];
   }[];
   english: { word: string }[];
-  category: CategoryEnum[];
+  category?: CategoryEnum[];
   createdAt?: string;
   updatedAt?: string;
   '@metadata'?: { '@id': string };
