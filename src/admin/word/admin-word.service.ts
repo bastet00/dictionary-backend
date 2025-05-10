@@ -3,6 +3,7 @@ import { CreateWordDto } from 'src/dto/input/word/create-word.dto';
 import { RavendbService } from 'src/raven/raven.service';
 import { UpdateWordDto } from './dto/update-word.dto';
 import { fromTransliterationToEgyptian } from 'src/dto/transformer/to-egyptian/from-transliteration-to-egyptian';
+import { Word } from 'src/raven/entities/word.entity';
 
 @Injectable()
 export class AdminWordService {
@@ -39,7 +40,11 @@ export class AdminWordService {
 
   create(createWordDto: CreateWordDto) {
     createWordDto = this.addWordToEgyptianDto(createWordDto);
-    return this.ravendbService.saveToDb(createWordDto, 'word');
+    const timeNow = new Date().toISOString();
+    return this.ravendbService.saveToDb(
+      { createWordDto, createdAt: timeNow, updatedAt: timeNow },
+      'word',
+    );
   }
 
   async delete(id: string) {
@@ -50,7 +55,7 @@ export class AdminWordService {
 
   async patch(id: string, updateWordDto: UpdateWordDto) {
     const session = this.ravendbService.session();
-    const doc = (await session.load(id)) as CreateWordDto;
+    const doc = (await session.load(id)) as Word;
     doc.egyptian[0].word = updateWordDto.egyptian[0].word;
     doc.egyptian[0].symbol = updateWordDto.egyptian[0].symbol;
     doc.arabic = updateWordDto.arabic;
@@ -59,6 +64,7 @@ export class AdminWordService {
       ? updateWordDto.category
       : doc.category;
 
+    doc.updatedAt = new Date().toISOString();
     await session.saveChanges();
     return doc;
   }
