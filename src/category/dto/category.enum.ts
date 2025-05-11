@@ -13,6 +13,5 @@ export enum CategoryEnum {
   emotions = 'emotions',
   clothes = 'clothes',
   music = 'music',
-  art = 'art',
   home = 'home',
 }
