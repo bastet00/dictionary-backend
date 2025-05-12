@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { RavendbService } from 'src/raven/raven.service';
+import { RavendbService } from '../raven/raven.service';
 import { CreateSuggestionDto } from './dto/word-suggestion.dto';
 
 @Injectable()

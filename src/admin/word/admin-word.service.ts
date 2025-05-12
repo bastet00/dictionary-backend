@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateWordDto } from 'src/dto/input/word/create-word.dto';
-import { RavendbService } from 'src/raven/raven.service';
+import { RavendbService } from '../../raven/raven.service';
 import { UpdateWordDto } from './dto/update-word.dto';
 import { fromTransliterationToEgyptian } from 'src/dto/transformer/to-egyptian/from-transliteration-to-egyptian';
 import { Word } from 'src/raven/entities/word.entity';

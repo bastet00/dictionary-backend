@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CategoryEnum } from './dto/category.enum';
-import { RavendbService } from 'src/raven/raven.service';
+import { RavendbService } from '../raven/raven.service';
 import { Word } from 'src/raven/entities/word.entity';
 
 @Injectable()
