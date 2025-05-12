@@ -118,6 +118,7 @@ export class WordService {
         arabic: word.arabic,
         egyptian: word.egyptian,
         english: word.english,
+        category: word.category,
       };
     });
   }
