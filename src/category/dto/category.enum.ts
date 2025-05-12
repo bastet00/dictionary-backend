@@ -15,4 +15,9 @@ export enum CategoryEnum {
   music = 'music',
   home = 'home',
   stones = 'stones',
+  temples = 'temples',
+  jobs = 'jobs',
+  adjective = 'adjective',
+  adverb = 'adverb',
+  verb = 'verb',
 }
