@@ -14,4 +14,5 @@ export enum CategoryEnum {
   clothes = 'clothes',
   music = 'music',
   home = 'home',
+  stones = 'stones',
 }
