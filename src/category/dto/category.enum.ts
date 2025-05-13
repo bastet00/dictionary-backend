@@ -18,6 +18,6 @@ export enum CategoryEnum {
   temples = 'temples',
   jobs = 'jobs',
   adjective = 'adjective',
-  adverb = 'adverb',
   verb = 'verb',
+  words_in_egyptian_dialect = 'words_in_egyptian_dialect',
 }
