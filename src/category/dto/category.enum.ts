@@ -21,4 +21,13 @@ export enum CategoryEnum {
   verb = 'verb',
   words_in_egyptian_dialect = 'words_in_egyptian_dialect',
   prepositions = 'prepositions',
+  insects = 'insects',
+  measurements = 'measurements',
+  countries = 'countries',
+  cities = 'cities',
+  egyptian_provinces = 'egyptian_provinces',
+  vegetables = 'vegetables',
+  fruits = 'fruits',
+  plants = 'plants',
+  cosmos = 'cosmos',
 }
