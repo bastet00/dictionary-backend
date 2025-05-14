@@ -20,4 +20,5 @@ export enum CategoryEnum {
   adjective = 'adjective',
   verb = 'verb',
   words_in_egyptian_dialect = 'words_in_egyptian_dialect',
+  prepositions = 'prepositions',
 }
