@@ -25,8 +25,7 @@ export enum CategoryEnum {
   measurements = 'measurements',
   countries = 'countries',
   egyptian_cities_provinces = 'egyptian_cities_provinces',
-  vegetables = 'vegetables',
-  fruits = 'fruits',
+  fruits_vegetables = 'fruits_vegetables',
   plants = 'plants',
   cosmos = 'cosmos',
 }
