@@ -28,4 +28,7 @@ export enum CategoryEnum {
   fruits_vegetables = 'fruits_vegetables',
   plants = 'plants',
   cosmos = 'cosmos',
+  female_names = 'female_names',
+  male_names = 'male_names',
+  kings_queens = 'kings_queens',
 }
