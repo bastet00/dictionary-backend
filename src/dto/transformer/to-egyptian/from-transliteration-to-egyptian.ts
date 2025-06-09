@@ -40,9 +40,9 @@ export const computerTransliterationToEgyptian = {
   z: 'ز',
   q: 'ق',
   k: 'ك',
-  g: 'چ',
+  D: 'چ',
   d: 'د',
-  D: 'ج',
+  g: 'ج',
   '=': '=',
   ',': ',',
 };
