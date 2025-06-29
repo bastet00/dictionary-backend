@@ -68,7 +68,9 @@ export class LiteralTranslationService {
     switch (lang) {
       case LiteralTransLanguageEnum.egyptian:
         return maxPrefixRange;
-      case LiteralTransLanguageEnum.arabic || LiteralTransLanguageEnum.english:
+      case LiteralTransLanguageEnum.arabic:
+        return multiLetter ? maxPrefixRange : 1;
+      case LiteralTransLanguageEnum.english:
         return multiLetter ? maxPrefixRange : 1;
     }
   }
