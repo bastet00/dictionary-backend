@@ -146,5 +146,5 @@ export const arabicToHieroglyphics: { [key: string]: string } = {
   موت: '𓅐',
   دشر: '𓅟',
   // quadriliteral signs
-  وجات: 'وجات',
+  وجات: '𓂀',
 };

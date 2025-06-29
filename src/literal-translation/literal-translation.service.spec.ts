@@ -177,7 +177,7 @@ describe('LiteralTranslationService', () => {
     expect(charachtersMapper[3].hieroglyphics).toBe('𓏌');
   });
 
-  it('should handle spaces between words', () => {
+  it('should handle spaces between words in arabic', () => {
     const text = 'نو ر';
     const charachtersMapper = service.getLiteralTranslation(text, {
       useMultiLetterSymbols: true,
@@ -220,5 +220,35 @@ describe('LiteralTranslationService', () => {
       }
     });
     expect(spaces).toEqual(2);
+  });
+
+  it('should handle spaces between words in english', () => {
+    const text = 'wn r';
+    const charachtersMapper = service.getLiteralTranslation(text, {
+      useMultiLetterSymbols: true,
+      lang: LiteralTransLanguageEnum.arabic,
+    }).lettersMapper;
+    expect(charachtersMapper[0].alphabetLetters).toBe('wn');
+    console.log(charachtersMapper[0].hieroglyphics);
+    expect(charachtersMapper[0].hieroglyphics).toBe('𓃹');
+    expect(charachtersMapper[1].hieroglyphics).toBe(' ');
+    expect(charachtersMapper[2].alphabetLetters).toBe('r');
+    expect(charachtersMapper[2].hieroglyphics).toBe('𓂋');
+  });
+
+  it('should translate 3 letters in english to triliteral sign', () => {
+    const text = 'ank';
+    const charachtersMapper = service.getLiteralTranslation(text, {
+      useMultiLetterSymbols: true,
+      lang: LiteralTransLanguageEnum.arabic,
+    });
+    expect(charachtersMapper.literalTranslation).toBe('𓋹');
+
+    const text2 = '3nk';
+    const charachtersMapper2 = service.getLiteralTranslation(text2, {
+      useMultiLetterSymbols: true,
+      lang: LiteralTransLanguageEnum.arabic,
+    });
+    expect(charachtersMapper2.literalTranslation).toBe('𓋹');
   });
 });
