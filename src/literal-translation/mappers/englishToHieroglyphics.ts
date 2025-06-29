@@ -30,7 +30,7 @@ export const englishToHieroglyphics: { [key: string]: string } = {
   // Alternative sounds for English
   e: '𓇋', // إ (like 'i')
   u: '𓅱', // و (like 'w')
-  o: '𓂝', // ع (like 'a')
+  o: '𓅱', // ع (like 'a')
   v: '𓆑', // ف (like 'f')
   c: '𓎡', // ك (like 'k')
   j: '𓎼', // ج (like 'g')

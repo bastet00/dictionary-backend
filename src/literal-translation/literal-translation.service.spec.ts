@@ -81,12 +81,12 @@ describe('LiteralTranslationService', () => {
   });
 
   it('should return the same text if no translation is found', () => {
-    const text = 'hello';
+    const text = '你好';
     expect(
       service.getLiteralTranslation(text, {
         lang: LiteralTransLanguageEnum.arabic,
       }).literalTranslation,
-    ).toBe(text);
+    ).toBe('你好');
   });
 
   it('should return charachtersMapper with the same length as the text', () => {
@@ -250,5 +250,13 @@ describe('LiteralTranslationService', () => {
       lang: LiteralTransLanguageEnum.arabic,
     });
     expect(charachtersMapper2.literalTranslation).toBe('𓋹');
+  });
+  it('should translate english to hieroglyphics with single letter', () => {
+    const text = 'hello';
+    expect(
+      service.getLiteralTranslation(text, {
+        lang: LiteralTransLanguageEnum.arabic,
+      }).literalTranslation,
+    ).toBe('𓉔𓇋𓃭𓃭𓅱');
   });
 });
