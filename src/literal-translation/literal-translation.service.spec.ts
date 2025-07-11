@@ -259,4 +259,13 @@ describe('LiteralTranslationService', () => {
       }).literalTranslation,
     ).toBe('𓉔𓇋𓃭𓃭𓅱');
   });
+
+  it('should translate uppercase english to hieroglyphics with single letter', () => {
+    const text = 'HeLLO';
+    expect(
+      service.getLiteralTranslation(text, {
+        lang: LiteralTransLanguageEnum.arabic,
+      }).literalTranslation,
+    ).toBe('𓉔𓇋𓃭𓃭𓅱');
+  });
 });

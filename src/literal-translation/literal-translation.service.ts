@@ -33,6 +33,7 @@ export class LiteralTranslationService {
       lang?: LiteralTransLanguageEnum;
     } = {},
   ): LiteralTranslationResultsDto {
+    text = text.toLowerCase();
     const { useMultiLetterSymbols, gender, lang } = options;
 
     if (!text) {
