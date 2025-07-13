@@ -128,6 +128,7 @@ export class CategoryService {
       .query<Word>({ collection: 'word' })
       .whereEquals('category', categoryId)
       .selectFields(['id', 'arabic', 'english', 'egyptian', 'category'])
+      .orderBy('egyptian.word')
       .all()) as Word[];
     return res.map((word) => this.toCategoryWordDto(word));
   }
