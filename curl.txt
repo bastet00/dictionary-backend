@@ -1,3 +1,10 @@
 curl -w "\n" -X PUT "localhost:3000/6a90b653-a2d7-480b-9812-c35db53e5543" -H "Content-Type:application/json" -d '{"Egyptian":[{"Word":"foo", "Symbol":"𓀎"}], "Arabic":[{"Word":"bar1"}]}' -H "Authorization:"
 
 curl -X GET 'localhost:3000/admin?page=1&per_page=20' -G --data-urlencode 'word=ا'
+
+
+curl localhost:3000/api/quizz/mcq \
+-X POST \
+-H "Content-Type:application/json" \
+-d '{"lessonName":"Being boring", "info":{"level":1, "section":2, "lesson":1}, "quizz": [ {"question":"what is the currency of egypt", "answers":[{"answer": "gneh kolomby", "isAnswer":false}, {"answer": "yen amerike", "isAnswer":false}, {"answer": "bezo flepiny", "isAnswer":true}] } , {"question":"what is most orange thing on earth", "answers":[{"answer": "orange", "isAnswer":false}, {"answer": "carton", "isAnswer":false}, {"answer": "donald trump", "isAnswer":true}] } , {"question":"what is the capital of america", "answers":[{"answer": "london", "isAnswer":false}, {"answer": "bekin", "isAnswer":false}, {"answer": "mexico", "isAnswer":true}] } , {"question":"describe postman", "answers":[{"answer": "fast", "isAnswer":false}, {"answer": "nice", "isAnswer":false}, {"answer": "the most boring software ever", "isAnswer":true}] } , {"question":"while using windows you can", "answers":[{"answer": "drink a coffe", "isAnswer":false}, {"answer": "kill somebody", "isAnswer":false}, {"answer": "boil an egg on your cpu before it melts", "isAnswer":true}]}], "type":"mcq"}'
+curl localhost:3000/api/quizz/mcq/check/94b8b4c1-480f-4533-a239-adfaffd5b79a -X POST -d '{"answers":[ { "questionId": 1, "answerId":3 }, { "questionId": 2, "answerId":6 }, { "questionId": 3, "answerId":9 } ]}' -H "Content-Type:application/json"

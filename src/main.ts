@@ -11,6 +11,7 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       forbidUnknownValues: true,
+      forbidNonWhitelisted: true,
     }),
   );
   app.use(bodyParser.json({ limit: '1mb' }));

@@ -1,6 +1,6 @@
 # RavenDB
 /ravenDB
-/curl.txt
+./curl.txt
 
 # compiled output
 /dist
