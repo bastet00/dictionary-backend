@@ -36,7 +36,7 @@ class Question {
   type: QuestionTypesEnum;
 }
 
-class McqDto {
+export class McqDto {
   qId: number;
 
   @IsString()
@@ -49,7 +49,7 @@ class McqDto {
   answers: McqAnswer[];
 }
 
-class McqAnswer {
+export class McqAnswer {
   @IsBoolean()
   isAnswer: boolean;
   @IsString()

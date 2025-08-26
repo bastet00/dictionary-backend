@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateMcqDto } from '../dto/create-question.dto';
+import { CreateMcqDto, McqAnswer, McqDto } from '../dto/create-question.dto';
 import { RavendbService } from '../../raven/raven.service';
 import { QuizzFilters } from '../dto/quizz-types.dto';
 import { McqEntity } from '../entities/mcq.entity';
@@ -70,37 +70,70 @@ export class McqService {
     }
     return quizz[0] as McqEntity;
   }
+
+  resultChain(value: Partial<McqDto>, failback) {
+    // TODO: use T for typing inhancment
+
+    // const self = this // hold higher level this for infinite chains
+
+    return {
+      value: value,
+      fallback: {},
+      bind: function (func: (obj: McqDto) => McqAnswer) {
+        if (!this.value) {
+          // console.log('no object at chain, previous chain fails');
+          this.failback = failback();
+          return { result: this.failback, fail: true };
+        }
+        return { result: func(this.value), fail: false };
+      },
+    };
+  }
+
+  questionOrAnswerNotFound() {
+    return {
+      question: '',
+      questionId: -1,
+      correct: false,
+      rightAnswer: -1,
+      userAnswer: -1,
+    };
+  }
+
   async checkQuizzAnswers(userAnswersDto: UserAnswersDto, quizzId: string) {
-    let score = 0;
     const result = [];
     const submittion = userAnswersDto.answers;
     const quizzEntity = await this.getQuizzByID(quizzId);
-    console.log('Querying for quizz id: ', quizzId);
+    let score = 0;
 
     submittion.map((userSumbittion) => {
-      const originalDoc = quizzEntity.quizz.find(
+      const questionDoc = quizzEntity.quizz.find(
         (obj) => obj.qId === userSumbittion.questionId,
       );
-      console.log(originalDoc);
+      const rc = this.resultChain(
+        questionDoc,
+        this.questionOrAnswerNotFound,
+      ).bind((value: McqDto) => value.answers.find((obj) => obj.isAnswer));
 
-      const checkAnswer = originalDoc.answers.find(
-        (answer) => answer.aId === userSumbittion.answerId,
-      );
-
-      if (checkAnswer && checkAnswer.isAnswer) {
+      if (!rc.fail && rc.result.aId === userSumbittion.answerId) {
         score++;
       }
 
-      result.push({
-        question: originalDoc.question,
-        userAnswer: userSumbittion.questionId,
-        correct: checkAnswer.isAnswer,
-      });
+      if (rc.fail) {
+        result.push(rc.result);
+      } else {
+        result.push({
+          question: questionDoc.question,
+          userAnswer: userSumbittion.answerId,
+          qId: questionDoc.qId,
+          correct: rc.result.aId === userSumbittion.answerId,
+          rightAnswer: rc.result.aId,
+        });
+      }
     });
-
     return {
       result: result,
-      score: score,
+      score: (score / quizzEntity.quizz.length) * 100,
     };
   }
 }
