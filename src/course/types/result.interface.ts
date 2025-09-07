@@ -1,6 +1,6 @@
 export interface Result {
   qid: number;
   question: string;
-  userAnswer: number;
+  userAnswer: number | number[];
   isCorrect: boolean;
 }
