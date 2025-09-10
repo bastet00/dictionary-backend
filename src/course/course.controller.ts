@@ -1,13 +1,15 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UserAnswerDto } from './dto/user-answers.dto';
+import { LoginGuard } from '../common/guards/login.guard';
 
-@Controller('api/course')
+@Controller('api/v1/course')
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
-  @Post('')
+  @UseGuards(LoginGuard)
+  @Post()
   createCourse(@Body() createCourseDto: CreateCourseDto) {
     return this.courseService.createCourse(createCourseDto);
   }
