@@ -1,6 +1,5 @@
 import { SequenceAnswers } from './sequence-answers.factory';
 import { McqAnswers } from './mcq-answers.factory';
-import { AnswersABC } from './answers.abs';
 import { BadRequestException } from '@nestjs/common';
 import { ExerciseDto } from '../dto/create-course.dto';
 import { UserAnswerDto } from '../dto/user-answers.dto';

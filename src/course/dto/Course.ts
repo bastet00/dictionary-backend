@@ -20,5 +20,10 @@ export interface Unit {
   num: number;
   title: string;
   exerciseIds: string[];
-  exercises?: ExerciseDto[];
+  exercises?: UnitExercise[];
+}
+
+export interface UnitExercise {
+  title: string;
+  questions: ExerciseDto[];
 }

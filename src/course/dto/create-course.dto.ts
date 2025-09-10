@@ -28,6 +28,10 @@ export class CreateCourseDto {
   @IsNotEmpty()
   unitTitle: string;
 
+  @IsString()
+  @IsNotEmpty()
+  exericseTitle: string;
+
   @Type(() => ExerciseDto)
   @ValidateNested({ each: true })
   @IsArray()
@@ -37,6 +41,8 @@ export class CreateCourseDto {
 
 export class ExerciseDto {
   id: string;
+  title?: string;
+
   @IsString()
   @IsNotEmpty()
   question: string;

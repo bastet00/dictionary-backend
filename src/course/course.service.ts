@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { RavendbService } from 'src/raven/raven.service';
 import { CreateCourseDto, ExerciseDto } from './dto/create-course.dto';
-import { Course, CourseDocument, Unit } from './dto/Course';
+import { Course, CourseDocument, Unit, UnitExercise } from './dto/Course';
 import { StorageOpts } from './types/storage-options';
 import { IDocumentSession } from 'ravendb';
 import { UserAnswerDto } from './dto/user-answers.dto';
@@ -58,19 +58,11 @@ export class CourseService {
       exerciseIds: [],
     } as Unit;
 
-    // TODO: consider think about this after correctness implementation
-    let qid = 1;
-    let aid = 1;
     createCourseDto.exercise.map((obj: ExerciseDto) => {
       const id = crypto.randomUUID();
       obj.id = id;
+      obj.title = createCourseDto.exericseTitle;
       unit.exerciseIds.push(obj.id);
-      obj.qid = qid;
-      obj.answers.map((obj) => {
-        obj.aid = aid;
-        aid++;
-      });
-      qid++;
     });
 
     course.units.push(unit);
@@ -132,15 +124,24 @@ export class CourseService {
         .single();
 
       for (const unit of course.units) {
+        const grouped: Record<string, UnitExercise> = {};
+
         for (const exerciseId of unit.exerciseIds) {
           const exById = await session.load<ExerciseDto>(exerciseId);
           delete exById['@metadata'];
-          if (!unit.exercises) {
-            unit.exercises = [];
+
+          if (!grouped[exById.title]) {
+            grouped[exById.title] = {
+              title: exById.title,
+              questions: [],
+            };
           }
 
-          unit.exercises.push(exById); // TODO: hide answers;
+          const { title, ...rest } = exById;
+          grouped[title].questions.push(rest);
         }
+
+        unit.exercises = Object.values(grouped);
         delete unit.exerciseIds;
       }
 
