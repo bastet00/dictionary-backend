@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CourseService } from './course.service';
-import { CourseController } from './course.controller';
+import { CourseController } from './controllers/course.controller';
 import { RavenModule } from 'src/raven/raven.module';
 
 @Module({

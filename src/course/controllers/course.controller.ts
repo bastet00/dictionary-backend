@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { CourseService } from './course.service';
-import { CreateCourseDto } from './dto/create-course.dto';
-import { UserAnswerDto } from './dto/user-answers.dto';
-import { LoginGuard } from '../common/guards/login.guard';
+import { CourseService } from '../course.service';
+import { CreateCourseDto } from '../dto/create-course.dto';
+import { UserAnswerDto } from '../dto/user-answers.dto';
+import { LoginGuard } from '../../common/guards/login.guard';
 
 @Controller('api/v1/course')
 export class CourseController {
