@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateCourseDto } from './dto/create-course.dto';
-import { DataBaseRepository } from './db/repository/course.repository';
-import { Course, CourseUnit } from './db/documents/course.document';
+import { CreateCourseDto } from '../dto/create-course.dto';
+import { DataBaseRepository } from '../db/repository/course.repository';
+import { Course, CourseUnit } from '../db/documents/course.document';
 
 @Injectable()
 export class CourseService {
