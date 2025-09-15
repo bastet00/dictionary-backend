@@ -1,165 +1,68 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { RavendbService } from 'src/raven/raven.service';
-import { CreateCourseDto, ExerciseDto } from './dto/create-course.dto';
-import { Course, CourseDocument, Unit, UnitExercise } from './dto/Course';
-import { StorageOpts } from './types/storage-options';
-import { IDocumentSession } from 'ravendb';
-import { UserAnswerDto } from './dto/user-answers.dto';
-import { AnswersFactory } from './factory/factory';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { CreateCourseDto } from './dto/create-course.dto';
+import { DataBaseRepository } from './db/repository/course.repository';
+import { Course, CourseUnit } from './db/documents/course.document';
 
 @Injectable()
 export class CourseService {
-  constructor(private ravenService: RavendbService) {}
+  constructor(private databaseRepo: DataBaseRepository) {}
 
-  async createCourse(createCourseDto: CreateCourseDto) {
-    const payloadToEntity = this.toEntities(createCourseDto);
-    const session = this.ravenService.session();
-    const buildCourseFn = this.courseBuild(session, payloadToEntity.course);
-    const buildExerciseFn = this.exerciseBuild(
-      session,
-      payloadToEntity.exercises,
-    );
-    try {
-      const courseDoc = await session
-        .query<CourseDocument>({ collection: 'course' })
-        .whereEquals('level', createCourseDto.courseLevel)
-        .single();
-
-      const [newUnit] = payloadToEntity.course.units;
-      if (courseDoc) {
-        const unit = courseDoc.units.find(
-          (obj) => obj.num === createCourseDto.unitNum,
-        );
-        if (unit) {
-          unit.exerciseIds.push(...newUnit.exerciseIds);
-          await buildExerciseFn();
-        } else {
-          courseDoc.units.push(newUnit);
-          await buildExerciseFn();
-        }
-      }
-    } catch {
-      await buildCourseFn();
-      await buildExerciseFn();
-    }
-    // console.log(session.advanced.numberOfRequests);
-    await session.saveChanges();
-  }
-
-  toEntities(createCourseDto: CreateCourseDto): Course {
+  private toDocument(createCourseDto: CreateCourseDto) {
+    this.databaseRepo;
     const course = {
-      title: createCourseDto.courseTitle,
-      level: createCourseDto.courseLevel,
+      title: createCourseDto.title,
+      level: createCourseDto.level,
       units: [],
     };
     const unit = {
-      num: createCourseDto.unitNum,
-      title: createCourseDto.unitTitle,
-      exerciseIds: [],
-    } as Unit;
-
-    createCourseDto.exercise.map((obj: ExerciseDto) => {
-      const id = crypto.randomUUID();
-      obj.id = id;
-      obj.title = createCourseDto.exericseTitle;
-      unit.exerciseIds.push(obj.id);
-    });
+      num: createCourseDto.unit.num,
+      title: createCourseDto.unit.title,
+      exercises: [],
+    } as CourseUnit;
 
     course.units.push(unit);
-    return {
-      course,
-      exercises: createCourseDto.exercise,
-    };
+    return course as Course;
   }
 
-  /**
-   * @returns: ready to call function which stores Course document
-   * */
-  courseBuild(session: IDocumentSession, data: Course[keyof Course]) {
-    const opts = {
-      collection: 'course',
-      seperation: false,
-      document: data,
-      session: session,
-    };
-    return async () => await this.storage(opts);
-  }
+  async createCourse(createCourseDto: CreateCourseDto) {
+    const repo = this.databaseRepo.withSession();
+    const course = await repo.loadOneByOrFail<Course>({
+      fieldName: 'level',
+      value: createCourseDto.level,
+    });
+    const newCourse = this.toDocument(createCourseDto);
 
-  /**
-   * @return: ready to call function which stores Exercise\s document
-   * */
-  exerciseBuild(session: IDocumentSession, data: Course[keyof Course]) {
-    const opts = {
-      collection: 'question',
-      seperation: true,
-      document: data,
-      session: session,
-    };
+    if (!course.founded) {
+      console.log(newCourse.units[0].exercises);
 
-    return async () => await this.storage(opts);
-  }
-
-  async storage(opts: StorageOpts) {
-    const session = opts.session;
-    const setup = (obj: any) => {
-      return { ...obj, '@metadata': { '@collection': opts.collection } };
-    };
-
-    if (opts.seperation) {
-      for (const exercise of opts.document as ExerciseDto[]) {
-        await session.store(setup(exercise), exercise.id);
-      }
-    } else {
-      await session.store(setup(opts.document), `${opts.collection}|`);
+      const doc = await repo.createDocument('course', newCourse);
+      repo.save();
+      return doc;
     }
+
+    const unitExists = course.result.units.some(
+      (unit) => unit.num === createCourseDto.unit.num,
+    );
+
+    if (unitExists) {
+      throw new BadRequestException('unit already exists');
+    }
+    course.result.units.push(newCourse.units[0]);
+    repo.save();
+    delete course.result['@metadata'];
+    return course.result;
   }
 
-  async getCourseByLevel(level: string) {
-    try {
-      const session = this.ravenService.session();
-      const course = await session
-        .query<CourseDocument>({ collection: 'course' })
-        .include('question')
-        .whereEquals('level', level)
-        .single();
-
-      for (const unit of course.units) {
-        const grouped: Record<string, UnitExercise> = {};
-
-        for (const exerciseId of unit.exerciseIds) {
-          const exById = await session.load<ExerciseDto>(exerciseId);
-          delete exById['@metadata'];
-
-          if (!grouped[exById.title]) {
-            grouped[exById.title] = {
-              title: exById.title,
-              questions: [],
-            };
-          }
-
-          const { title, ...rest } = exById;
-          grouped[title].questions.push(rest);
-        }
-
-        unit.exercises = Object.values(grouped);
-        delete unit.exerciseIds;
-      }
-
-      return { ...course, '@metadata': undefined };
-    } catch {
-      throw new NotFoundException('course level doesnt exist');
+  async getCourse(level: string) {
+    const repo = this.databaseRepo.withSession();
+    const course = await repo.loadOneByOrFail<Course>({
+      fieldName: 'level',
+      value: level,
+    });
+    if (!course.founded) {
+      throw new BadRequestException('course level not founded');
     }
-  }
-
-  async checkUserAnswers(eId: string, userAnswerDto: UserAnswerDto) {
-    const session = this.ravenService.session();
-    const exercise = await session.load<ExerciseDto>(eId);
-    if (exercise) {
-      const result = new AnswersFactory()
-        .initialize()
-        .check(exercise, userAnswerDto);
-      return result;
-    }
-    throw new NotFoundException('exercise id doesnt exist');
+    delete course.result['@metadata'];
+    return course.result;
   }
 }

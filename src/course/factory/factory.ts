@@ -1,8 +1,5 @@
 import { SequenceAnswers } from './sequence-answers.factory';
 import { McqAnswers } from './mcq-answers.factory';
-import { BadRequestException } from '@nestjs/common';
-import { ExerciseDto } from '../dto/create-course.dto';
-import { UserAnswerDto } from '../dto/user-answers.dto';
 
 export type ExerciseTypes = SequenceAnswers | McqAnswers;
 
@@ -43,14 +40,5 @@ export class AnswersFactory {
       if (register.name === type) return register.of;
     }
     return new Error();
-  }
-
-  check(exercise: ExerciseDto, userAnswer: UserAnswerDto) {
-    const register = this.factorize(exercise.type);
-    if (register instanceof Error) {
-      throw new BadRequestException('invalid type');
-    }
-
-    return register.correctnessByType(exercise, userAnswer);
   }
 }

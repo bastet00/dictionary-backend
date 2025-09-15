@@ -1,4 +1,4 @@
-export interface CourseExercise {
+export interface UnitExercise {
   title: string;
   id: string;
 }
@@ -6,7 +6,7 @@ export interface CourseExercise {
 export interface CourseUnit {
   num: number;
   title: string;
-  exercises: CourseExercise[];
+  exercises: UnitExercise[];
 }
 
 export interface Course {
