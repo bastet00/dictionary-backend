@@ -76,7 +76,7 @@ export class DataBaseRepository {
 
   loadById<T>(id: string, session?: IDocumentSession) {
     return this.maybeFail(async () => {
-      const res = (await session.load(id)) as Promise<T>;
+      const res = (await session.load(id)) as T;
       if (!res) throw new Error();
       return res;
     });
@@ -92,7 +92,7 @@ export class DataBaseRepository {
     });
   }
 
-  private async maybeFail<T>(action: () => Promise<T> | T | T[]) {
+  private async maybeFail<T>(action: () => Promise<T>) {
     const maybe = {} as { result: any; founded: boolean };
     try {
       maybe.result = (await action()) as T;

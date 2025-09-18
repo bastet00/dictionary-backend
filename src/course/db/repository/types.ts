@@ -1,5 +1,3 @@
-import { IAdvancedSessionOperations } from 'ravendb';
-
 export type RepositoryCollections = 'course' | 'exercise' | 'question';
 
 export interface IWhere {
@@ -35,7 +33,6 @@ type CreateDocument = (
 }>;
 
 type Save = () => Promise<void>;
-type Advanced = () => IAdvancedSessionOperations;
 type LoadAllOrderKey<T> = (
   collection: RepositoryCollections,
   key: string,
@@ -52,7 +49,6 @@ export interface Repository {
   ): ReturnType<CreateDocument>;
   save(...args: Parameters<Save>): ReturnType<Save>;
   loadById<T>(...args: Parameters<LoadById<T>>): ReturnType<LoadById<T>>;
-  advanced(...args: Parameters<Advanced>): ReturnType<Advanced>;
   loadAllOrderKey<T>(
     ...args: Parameters<LoadAllOrderKey<T>>
   ): ReturnType<LoadAllOrderKey<T>>;
