@@ -118,9 +118,9 @@ export class DataBaseRepository {
     }
   }
 
-  async createDocument(
+  async createDocument<T>(
     collection: RepositoryCollections,
-    document: any,
+    document: T,
     session?: IDocumentSession,
   ) {
     const setup = (obj: any) => {
