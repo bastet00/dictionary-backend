@@ -6,7 +6,6 @@ import { QuestionService } from '../services/question.service';
 export class QuestionController {
   constructor(private questionService: QuestionService) {}
 
-  // TODO: create a controller for question
   @Post()
   createQuestion(@Body() createQuestionDto: CreateQuestionDto) {
     return this.questionService.createQuestion(createQuestionDto);
