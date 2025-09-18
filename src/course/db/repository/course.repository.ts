@@ -79,13 +79,29 @@ export class DataBaseRepository {
     });
   }
 
-  async loadAllOrderKey<T>(collection: RepositoryCollections, key: string) {
+  loadAllOrderKey<T>(collection: RepositoryCollections, key: string) {
     return this.maybeFail(async () => {
       const res = (await this.queryOn(collection)
         .orderByDescending(key)
         .all()) as T[];
       if (!res) throw new Error();
       return res;
+    });
+  }
+
+  async loadByIdAndRelations<T>(
+    id: string,
+    include: RepositoryCollections[],
+    session?: IDocumentSession,
+  ) {
+    return this.maybeFail(async () => {
+      const builder = include.reduce(
+        (acc, collection) => acc.include(collection),
+        session,
+      );
+      const res = builder.load(id);
+      if (!res) throw new Error();
+      return res as T;
     });
   }
 

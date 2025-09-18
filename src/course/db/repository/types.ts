@@ -1,3 +1,5 @@
+import { IDocumentQuery } from 'ravendb';
+
 export type RepositoryCollections = 'course' | 'exercise' | 'question';
 
 export interface IWhere {
@@ -14,14 +16,14 @@ export interface StorageOpts {
   collection: RepositoryCollections;
 }
 
-type Maybe<T> = Promise<{
+export type Maybe<T> = Promise<{
   result: Awaited<T>;
   founded: boolean;
 }>;
 
 type LoadOneByOrFail<T> = (opts: IWhere) => Maybe<T>;
 
-type QueryOn = (collection: RepositoryCollections) => object;
+type QueryOn = (collection: RepositoryCollections) => IDocumentQuery<object>;
 type LoadById<T> = (id: string) => Maybe<T>;
 
 type CreateDocument = (
@@ -38,6 +40,11 @@ type LoadAllOrderKey<T> = (
   key: string,
 ) => Maybe<T>;
 
+type LoadByIdAndRelations<T> = (
+  id: string,
+  include: RepositoryCollections[],
+) => Maybe<T>;
+
 export interface Repository {
   loadOneByOrFail<T>(
     ...args: Parameters<LoadOneByOrFail<T>>
@@ -52,4 +59,7 @@ export interface Repository {
   loadAllOrderKey<T>(
     ...args: Parameters<LoadAllOrderKey<T>>
   ): ReturnType<LoadAllOrderKey<T>>;
+  loadByIdAndRelations<T>(
+    ...args: Parameters<LoadByIdAndRelations<T>>
+  ): ReturnType<LoadByIdAndRelations<T>>;
 }

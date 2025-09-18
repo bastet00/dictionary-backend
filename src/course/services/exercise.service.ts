@@ -48,11 +48,22 @@ export class ExerciseService {
 
   async getExerciseById(id: string) {
     const repo = this.databaseRepo.withSession();
-    const exercise = await repo.loadById(id);
+    const exercise = await repo.loadByIdAndRelations<Exercise>(id, [
+      'question',
+    ]);
     if (!exercise.founded) {
       throw new BadRequestException('id doesnt exist');
     }
-    delete exercise.result['@metadata'];
-    return exercise.result;
+    const questions = [] as Question[];
+    for (const question of exercise.result.questions) {
+      const questionDoc = await repo.loadById<Question>(question.id);
+      delete questionDoc.result['@metadata'];
+      questions.push(questionDoc.result);
+    }
+    return {
+      id: exercise.result.id,
+      title: exercise.result.title,
+      questions: questions,
+    };
   }
 }
