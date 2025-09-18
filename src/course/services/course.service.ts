@@ -36,8 +36,6 @@ export class CourseService {
     const newCourse = this.toDocument(createCourseDto);
 
     if (!course.founded) {
-      console.log(newCourse.units[0].exercises);
-
       const doc = await repo.createDocument('course', newCourse);
       repo.save();
       return doc;
@@ -87,7 +85,7 @@ export class CourseService {
       (obj) => obj.num === patchUnitExerciseDto.unitNum,
     );
     if (unitIdx === -1) {
-      throw new BadRequestException('unit number doesnt exist');
+      throw new BadRequestException('unit number doesnt exist in this course');
     }
     course.result.units[unitIdx].exercises.push({
       id: exercise.result.id,
