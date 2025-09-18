@@ -59,9 +59,6 @@ export class DataBaseRepository {
     return proxy;
   }
 
-  advanced(session?: IDocumentSession) {
-    return session.advanced;
-  }
   queryOn(collection: RepositoryCollections, session?: IDocumentSession) {
     return session.query({ collection });
   }
