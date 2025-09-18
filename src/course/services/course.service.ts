@@ -2,6 +2,8 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCourseDto } from '../dto/create-course.dto';
 import { DataBaseRepository } from '../db/repository/course.repository';
 import { Course, CourseUnit } from '../db/documents/course.document';
+import { PatchUnitExerciseDto } from '../dto/patch-unit-exercise.dto';
+import { Exercise } from '../db/documents/exercise.document';
 
 @Injectable()
 export class CourseService {
@@ -29,6 +31,7 @@ export class CourseService {
     const course = await repo.loadOneByOrFail<Course>({
       fieldName: 'level',
       value: createCourseDto.level,
+      collection: 'course',
     });
     const newCourse = this.toDocument(createCourseDto);
 
@@ -58,10 +61,39 @@ export class CourseService {
     const course = await repo.loadOneByOrFail<Course>({
       fieldName: 'level',
       value: level,
+      collection: 'course',
     });
     if (!course.founded) {
       throw new BadRequestException('course level not founded');
     }
+    delete course.result['@metadata'];
+    return course.result;
+  }
+
+  async patchUnitExercise(patchUnitExerciseDto: PatchUnitExerciseDto) {
+    const repo = this.databaseRepo.withSession();
+    const course = await repo.loadById<Course>(patchUnitExerciseDto.courseId);
+    if (!course.founded) {
+      throw new BadRequestException('course id doesnt exist');
+    }
+
+    const exercise = await repo.loadById<Exercise>(
+      patchUnitExerciseDto.exerciseId,
+    );
+    if (!exercise.founded) {
+      throw new BadRequestException('exercise id doesnt exist');
+    }
+    const unitIdx = course.result.units.findIndex(
+      (obj) => obj.num === patchUnitExerciseDto.unitNum,
+    );
+    if (unitIdx === -1) {
+      throw new BadRequestException('unit number doesnt exist');
+    }
+    course.result.units[unitIdx].exercises.push({
+      id: exercise.result.id,
+      title: exercise.result.title,
+    });
+    repo.save();
     delete course.result['@metadata'];
     return course.result;
   }

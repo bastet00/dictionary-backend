@@ -18,6 +18,7 @@ export class DataBaseRepository {
     const session = this.ravenService.session();
     this._session = session;
   }
+
   private freeSession() {
     this._session = null;
   }
@@ -40,17 +41,17 @@ export class DataBaseRepository {
 
     const proxy = new Proxy(this, {
       get(target, prop, receiver) {
-        const orig = Reflect.get(target, prop, receiver);
+        const forward = Reflect.get(target, prop, receiver);
 
         return (...args: any[]) => {
-          if (typeof orig === 'function') {
-            const expectsSession = orig.length > args.length;
-            if (expectsSession) {
+          if (typeof forward === 'function') {
+            const expectSession = forward.length > args.length;
+            if (expectSession) {
               args.push(self.getSession());
             }
-            return orig.apply(proxy, args);
+            return forward.apply(proxy, args);
           }
-          return orig;
+          return forward;
         };
       },
     });
@@ -58,17 +59,50 @@ export class DataBaseRepository {
     return proxy;
   }
 
+  advanced(session?: IDocumentSession) {
+    return session.advanced;
+  }
   queryOn(collection: RepositoryCollections, session?: IDocumentSession) {
     return session.query({ collection });
   }
 
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  async loadOneByOrFail<T>(opts: IWhere, session?: IDocumentSession) {
-    return this.maybeFail(async () => {
-      return this.queryOn('course')
+  loadOneByOrFail<T>(opts: IWhere) {
+    return this.maybeFail(() => {
+      return this.queryOn(opts.collection)
         .whereEquals(opts.fieldName, opts.value)
         .single() as Promise<T>;
     });
+  }
+
+  loadById<T>(id: string, session?: IDocumentSession) {
+    return this.maybeFail(async () => {
+      const res = (await session.load(id)) as Promise<T>;
+      if (!res) throw new Error();
+      return res;
+    });
+  }
+
+  async loadAllOrderKey<T>(collection: RepositoryCollections, key: string) {
+    return this.maybeFail(async () => {
+      const res = (await this.queryOn(collection)
+        .orderByDescending(key)
+        .all()) as T[];
+      if (!res) throw new Error();
+      return res;
+    });
+  }
+
+  private async maybeFail<T>(action: () => Promise<T> | T | T[]) {
+    const maybe = {} as { result: any; founded: boolean };
+    try {
+      maybe.result = (await action()) as T;
+      maybe.founded = true;
+    } catch {
+      maybe.result = null;
+      maybe.founded = false;
+    } finally {
+      return maybe;
+    }
   }
 
   async createDocument(
@@ -83,19 +117,6 @@ export class DataBaseRepository {
 
     await session.store(setup(document), id);
     return { ...document, id };
-  }
-
-  private async maybeFail<T>(action: () => Promise<T>) {
-    const maybe = {} as { result: any; founded: boolean };
-    try {
-      maybe.result = (await action()) as T;
-      maybe.founded = true;
-    } catch {
-      maybe.result = null;
-      maybe.founded = false;
-    } finally {
-      return maybe;
-    }
   }
 
   async save(session?: IDocumentSession) {

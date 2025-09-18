@@ -1,8 +1,11 @@
+import { IAdvancedSessionOperations } from 'ravendb';
+
 export type RepositoryCollections = 'course' | 'exercise' | 'question';
 
 export interface IWhere {
   fieldName: string;
   value: any;
+  collection: RepositoryCollections;
   allowWildcards?: boolean;
   nestedPath?: boolean;
   exact?: any;
@@ -13,12 +16,15 @@ export interface StorageOpts {
   collection: RepositoryCollections;
 }
 
-export type LoadOneByOrFail<T> = (opts: IWhere) => Promise<{
+type Maybe<T> = Promise<{
   result: Awaited<T>;
   founded: boolean;
 }>;
 
+type LoadOneByOrFail<T> = (opts: IWhere) => Maybe<T>;
+
 type QueryOn = (collection: RepositoryCollections) => object;
+type LoadById<T> = (id: string) => Maybe<T>;
 
 type CreateDocument = (
   collection: RepositoryCollections,
@@ -29,6 +35,11 @@ type CreateDocument = (
 }>;
 
 type Save = () => Promise<void>;
+type Advanced = () => IAdvancedSessionOperations;
+type LoadAllOrderKey<T> = (
+  collection: RepositoryCollections,
+  key: string,
+) => Maybe<T>;
 
 export interface Repository {
   loadOneByOrFail<T>(
@@ -40,4 +51,9 @@ export interface Repository {
     ...args: Parameters<CreateDocument>
   ): ReturnType<CreateDocument>;
   save(...args: Parameters<Save>): ReturnType<Save>;
+  loadById<T>(...args: Parameters<LoadById<T>>): ReturnType<LoadById<T>>;
+  advanced(...args: Parameters<Advanced>): ReturnType<Advanced>;
+  loadAllOrderKey<T>(
+    ...args: Parameters<LoadAllOrderKey<T>>
+  ): ReturnType<LoadAllOrderKey<T>>;
 }

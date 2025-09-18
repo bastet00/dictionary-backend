@@ -1,4 +1,6 @@
 import { Type } from 'class-transformer';
+
+import { Exercise } from '../db/documents/exercise.document';
 import {
   IsInt,
   IsNotEmpty,
@@ -6,7 +8,18 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { UnitDto } from './unit.dto';
+
+class UnitDto {
+  @IsInt()
+  @Min(1)
+  num: number;
+
+  @IsNotEmpty()
+  @IsString()
+  title: string;
+
+  exercises: Exercise[];
+}
 
 export class CreateCourseDto {
   @IsNotEmpty()

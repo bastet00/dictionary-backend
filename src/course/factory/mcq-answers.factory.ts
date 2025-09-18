@@ -12,4 +12,19 @@ export class McqAnswers implements AnswersABC {
   typeName(): string {
     return 'mcq';
   }
+
+  // correctnessByType(document: any, userAnswer: UserAnswerDto): Result {
+  //   const isCorrect = document.answers.some(
+  //     (obj) => obj.aid === userAnswer.aid,
+  //   );
+  //
+  //   if (isCorrect) {
+  //     return {
+  //       qid: document.qid,
+  //       question: document.question,
+  //       userAnswer: userAnswer.aid,
+  //       isCorrect: isCorrect,
+  //     };
+  //   }
+  // }
 }

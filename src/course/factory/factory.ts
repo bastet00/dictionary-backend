@@ -1,9 +1,9 @@
 import { SequenceAnswers } from './sequence-answers.factory';
 import { McqAnswers } from './mcq-answers.factory';
 
-export type ExerciseTypes = SequenceAnswers | McqAnswers;
+export type QuestionAnswers = SequenceAnswers | McqAnswers;
 
-type Registers = { name: string; of: ExerciseTypes };
+type Registers = { name: string; of: QuestionAnswers };
 
 /**
  * Handles:
