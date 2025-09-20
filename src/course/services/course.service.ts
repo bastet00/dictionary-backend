@@ -1,16 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCourseDto } from '../dto/create-course.dto';
-import { DataBaseRepository } from '../db/repository/course.repository';
+import { CourseRepository } from '../db/repository/course.repository';
+import { ExerciseRepository } from '../db/repository/exercise.repository';
 import { Course, CourseUnit } from '../db/documents/course.document';
 import { PatchUnitExerciseDto } from '../dto/patch-unit-exercise.dto';
-import { Exercise } from '../db/documents/exercise.document';
 
 @Injectable()
 export class CourseService {
-  constructor(private databaseRepo: DataBaseRepository) {}
+  constructor(
+    private courseRepository: CourseRepository,
+    private exerciseRepository: ExerciseRepository,
+  ) {}
 
-  private toDocument(createCourseDto: CreateCourseDto) {
-    this.databaseRepo;
+  private toDocument(createCourseDto: CreateCourseDto): Omit<Course, 'id'> {
     const course = {
       title: createCourseDto.title,
       level: createCourseDto.level,
@@ -23,76 +25,80 @@ export class CourseService {
     } as CourseUnit;
 
     course.units.push(unit);
-    return course as Course;
+    return course as Omit<Course, 'id'>;
   }
 
-  async createCourse(createCourseDto: CreateCourseDto) {
-    const repo = this.databaseRepo.withSession();
-    const course = await repo.loadOneByOrFail<Course>({
-      fieldName: 'level',
-      value: createCourseDto.level,
-      collection: 'course',
-    });
-    const newCourse = this.toDocument(createCourseDto);
+  async createCourse(createCourseDto: CreateCourseDto): Promise<Course> {
+    const existingCourse = await this.courseRepository.findByLevel(
+      createCourseDto.level,
+    );
+    const newCourseData = this.toDocument(createCourseDto);
 
-    if (!course.founded) {
-      const doc = await repo.createDocument('course', newCourse);
-      repo.save();
-      return doc;
+    if (!existingCourse) {
+      // Create new course
+      return this.courseRepository.withSession(async (session) => {
+        return this.courseRepository.create(newCourseData, session);
+      });
     }
 
-    const unitExists = course.result.units.some(
+    // Check if unit already exists
+    const unitExists = existingCourse.units.some(
       (unit) => unit.num === createCourseDto.unit.num,
     );
 
     if (unitExists) {
       throw new BadRequestException('unit already exists');
     }
-    course.result.units.push(newCourse.units[0]);
-    repo.save();
-    delete course.result['@metadata'];
-    return course.result;
+
+    // Add unit to existing course
+    return this.courseRepository.addUnitToCourse(
+      existingCourse.id!,
+      newCourseData.units[0],
+    );
   }
 
-  async getCourse(level: string) {
-    const repo = this.databaseRepo.withSession();
-    const course = await repo.loadOneByOrFail<Course>({
-      fieldName: 'level',
-      value: level,
-      collection: 'course',
-    });
-    if (!course.founded) {
-      throw new BadRequestException('course level not founded');
+  async getCourse(level: string): Promise<Course> {
+    const course = await this.courseRepository.findByLevel(parseInt(level));
+    if (!course) {
+      throw new BadRequestException('course level not found');
     }
-    delete course.result['@metadata'];
-    return course.result;
+    return course;
   }
 
-  async patchUnitExercise(patchUnitExerciseDto: PatchUnitExerciseDto) {
-    const repo = this.databaseRepo.withSession();
-    const course = await repo.loadById<Course>(patchUnitExerciseDto.courseId);
-    if (!course.founded) {
-      throw new BadRequestException('course id doesnt exist');
+  async patchUnitExercise(
+    patchUnitExerciseDto: PatchUnitExerciseDto,
+  ): Promise<Course> {
+    const course = await this.courseRepository.findById(
+      patchUnitExerciseDto.courseId,
+    );
+    if (!course) {
+      throw new BadRequestException('course id does not exist');
     }
 
-    const exercise = await repo.loadById<Exercise>(
+    const exercise = await this.exerciseRepository.findById(
       patchUnitExerciseDto.exerciseId,
     );
-    if (!exercise.founded) {
-      throw new BadRequestException('exercise id doesnt exist');
+    if (!exercise) {
+      throw new BadRequestException('exercise id does not exist');
     }
-    const unitIdx = course.result.units.findIndex(
-      (obj) => obj.num === patchUnitExerciseDto.unitNum,
+
+    const exerciseData = {
+      id: exercise.id!,
+      title: exercise.title,
+    };
+
+    const updatedCourse = await this.courseRepository.addExerciseToUnit(
+      course.id!,
+      patchUnitExerciseDto.unitNum,
+      exerciseData,
     );
-    if (unitIdx === -1) {
-      throw new BadRequestException('unit number doesnt exist in this course');
+
+    if (!updatedCourse) {
+      throw new BadRequestException(
+        'unit number does not exist in this course',
+      );
     }
-    course.result.units[unitIdx].exercises.push({
-      id: exercise.result.id,
-      title: exercise.result.title,
-    });
-    repo.save();
-    delete course.result['@metadata'];
-    return course.result;
+
+    return updatedCourse;
   }
 }

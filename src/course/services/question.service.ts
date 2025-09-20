@@ -1,39 +1,30 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { DataBaseRepository } from '../db/repository/course.repository';
+import { QuestionRepository } from '../db/repository/question.repository';
 import { CreateQuestionDto } from '../dto/create-question.dto';
 import { Question } from '../db/documents/question.document';
 
 @Injectable()
 export class QuestionService {
-  constructor(private databaseRepo: DataBaseRepository) {}
+  constructor(private questionRepository: QuestionRepository) {}
 
-  createQuestion(createQuestionDto: CreateQuestionDto) {
-    const repo = this.databaseRepo.withSession();
-    const now = new Date();
+  async createQuestion(
+    createQuestionDto: CreateQuestionDto,
+  ): Promise<Question> {
+    const questionData: Omit<Question, 'id' | 'created' | 'updated'> = {
+      question: createQuestionDto.question,
+      type: createQuestionDto.type,
+      answer: createQuestionDto.answer,
+      tags: createQuestionDto.tags || [],
+    };
 
-    createQuestionDto.created = now;
-    createQuestionDto.updated = now;
-
-    if (!createQuestionDto.tags) {
-      createQuestionDto.tags = [];
-    }
-    const ques = repo.createDocument('question', createQuestionDto);
-    repo.save();
-    return ques;
+    return this.questionRepository.createQuestion(questionData);
   }
 
-  async getQuestions() {
-    const repo = this.databaseRepo.withSession();
-    const questions = await repo.loadAllOrderKey<Question[]>(
-      'question',
-      'created',
-    );
-    if (!questions.founded) {
-      throw new BadRequestException('no questions');
+  async getQuestions(): Promise<Question[]> {
+    const questions = await this.questionRepository.findAllByCreated();
+    if (!questions || questions.length === 0) {
+      throw new BadRequestException('no questions found');
     }
-    for (const question of questions.result) {
-      delete question['@metadata'];
-    }
-    return questions.result;
+    return questions;
   }
 }

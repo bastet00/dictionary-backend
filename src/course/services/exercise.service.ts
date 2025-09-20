@@ -1,69 +1,64 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { DataBaseRepository } from '../db/repository/course.repository';
+import { ExerciseRepository } from '../db/repository/exercise.repository';
+import { QuestionRepository } from '../db/repository/question.repository';
 import { CreateExerciseDto } from '../dto/create-exercise.dto';
 import { Exercise } from '../db/documents/exercise.document';
 import { Question } from '../db/documents/question.document';
 
 @Injectable()
 export class ExerciseService {
-  constructor(private databaseRepo: DataBaseRepository) {}
+  constructor(
+    private exerciseRepository: ExerciseRepository,
+    private questionRepository: QuestionRepository,
+  ) {}
 
-  loadExerciseByTitle(title: string) {
-    return this.databaseRepo.withSession().loadOneByOrFail<Exercise>({
-      fieldName: 'title',
-      value: title,
-      collection: 'exercise',
+  async loadExerciseByTitle(title: string): Promise<Exercise | null> {
+    return this.exerciseRepository.findByTitle(title);
+  }
+
+  async createExercise(
+    createExerciseDto: CreateExerciseDto,
+  ): Promise<Exercise> {
+    const existingExercise = await this.loadExerciseByTitle(
+      createExerciseDto.title,
+    );
+    if (existingExercise) {
+      throw new BadRequestException('exercise already exists');
+    }
+
+    const exerciseData: Omit<Exercise, 'id'> = {
+      title: createExerciseDto.title,
+      questions: [],
+    };
+
+    return this.exerciseRepository.withSession(async (session) => {
+      return this.exerciseRepository.create(exerciseData, session);
     });
   }
 
-  async createExercise(createExerciseDto: CreateExerciseDto) {
-    const repo = this.databaseRepo.withSession();
-    const exericse = await this.loadExerciseByTitle(createExerciseDto.title);
-    if (exericse.founded) {
-      throw new BadRequestException('exericse exists');
-    }
-
-    createExerciseDto.questions = [];
-    const newExercise = repo.createDocument('exercise', createExerciseDto);
-    repo.save();
-    return newExercise;
-  }
-
-  async pushQuestionToExercise(eTitle: string, qid: string) {
-    const repo = this.databaseRepo.withSession();
-    const question = await repo.loadById<Question>(qid);
-    if (!question.founded) {
-      throw new BadRequestException('question not founded');
+  async pushQuestionToExercise(eTitle: string, qid: string): Promise<Exercise> {
+    const question = await this.questionRepository.findById(qid);
+    if (!question) {
+      throw new BadRequestException('question not found');
     }
 
     const exercise = await this.loadExerciseByTitle(eTitle);
-    if (!exercise.founded) {
-      throw new BadRequestException('exercise not founded');
+    if (!exercise) {
+      throw new BadRequestException('exercise not found');
     }
-    exercise.result.questions.push({ id: question.result.id });
-    delete exercise.result['@metadata'];
-    repo.save();
-    return exercise.result;
+
+    return this.exerciseRepository.addQuestionToExercise(exercise.id!, qid);
   }
 
-  async getExerciseById(id: string) {
-    const repo = this.databaseRepo.withSession();
-    const exercise = await repo.loadByIdAndRelations<Exercise>(id, [
-      'question',
-    ]);
-    if (!exercise.founded) {
-      throw new BadRequestException('id doesnt exist');
+  async getExerciseById(id: string): Promise<{
+    id: string;
+    title: string;
+    questions: Question[];
+  }> {
+    const result = await this.exerciseRepository.getExerciseWithQuestions(id);
+    if (!result) {
+      throw new BadRequestException('exercise not found');
     }
-    const questions = [] as Question[];
-    for (const question of exercise.result.questions) {
-      const questionDoc = await repo.loadById<Question>(question.id);
-      delete questionDoc.result['@metadata'];
-      questions.push(questionDoc.result);
-    }
-    return {
-      id: exercise.result.id,
-      title: exercise.result.title,
-      questions: questions,
-    };
+    return result;
   }
 }

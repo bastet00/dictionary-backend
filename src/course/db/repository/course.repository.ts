@@ -1,139 +1,86 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { BaseRepository } from './base.repository';
 import { RavendbService } from 'src/raven/raven.service';
-import { IDocumentSession } from 'ravendb';
-import { IWhere, Repository, RepositoryCollections } from './types';
+import { Course } from '../documents/course.document';
 
-// TODO: class functions is exposed and calling any function without withSession opens different session
-// wrap it with A Repository class where it holds only withSession function
-@Injectable({ scope: Scope.TRANSIENT })
-export class DataBaseRepository {
-  private _session: IDocumentSession;
-  constructor(private ravenService: RavendbService) {}
-
-  private getSession() {
-    return this._session;
+@Injectable()
+export class CourseRepository extends BaseRepository<Course> {
+  constructor(ravenService: RavendbService) {
+    super(ravenService);
   }
 
-  private setSession() {
-    const session = this.ravenService.session();
-    this._session = session;
-  }
-
-  private freeSession() {
-    this._session = null;
+  protected getCollectionName(): string {
+    return 'course';
   }
 
   /**
-   * creates a proxy layer between this class and any following function call to the class itself
-   * the proxy layer injects the session or create a new session then inject it using
-   * set , get session
-   * this helps to keep the same unit of work(session) per each withSession function call until calling save()
-   
-   * @returns: same class with proxy layer that injects session to any method receive and operate on session
-   * 
-   * */
-  withSession(): Omit<Repository, 'withSession'> {
-    if (!this.getSession()) {
-      this.setSession();
-    }
-    /* eslint-disable @typescript-eslint/no-this-alias */
-    const self = this;
-
-    const proxy = new Proxy(this, {
-      get(target, prop, receiver) {
-        const forward = Reflect.get(target, prop, receiver);
-
-        return (...args: any[]) => {
-          if (typeof forward === 'function') {
-            const expectSession = forward.length > args.length;
-            if (expectSession) {
-              args.push(self.getSession());
-            }
-            return forward.apply(proxy, args);
-          }
-          return forward;
-        };
-      },
-    });
-
-    return proxy;
-  }
-
-  queryOn(collection: RepositoryCollections, session?: IDocumentSession) {
-    return session.query({ collection });
-  }
-
-  loadOneByOrFail<T>(opts: IWhere) {
-    return this.maybeFail(() => {
-      return this.queryOn(opts.collection)
-        .whereEquals(opts.fieldName, opts.value)
-        .single() as Promise<T>;
+   * Find course by level
+   */
+  async findByLevel(level: number): Promise<Course | null> {
+    return this.withReadSession(async (session) => {
+      return this.findOneBy('level', level, session);
     });
   }
 
-  loadById<T>(id: string, session?: IDocumentSession) {
-    return this.maybeFail(async () => {
-      const res = (await session.load(id)) as T;
-      if (!res) throw new Error();
-      return res;
+  /**
+   * Find course by title
+   */
+  async findByTitle(title: string): Promise<Course | null> {
+    return this.withReadSession(async (session) => {
+      return this.findOneBy('title', title, session);
     });
   }
 
-  loadAllOrderKey<T>(collection: RepositoryCollections, key: string) {
-    return this.maybeFail(async () => {
-      const res = (await this.queryOn(collection)
-        .orderByDescending(key)
-        .all()) as T[];
-      if (!res) throw new Error();
-      return res;
+  /**
+   * Get all courses ordered by level
+   */
+  async findAllByLevel(): Promise<Course[]> {
+    return this.withReadSession(async (session) => {
+      return this.findAll('level', 'asc', session);
     });
   }
 
-  async loadByIdAndRelations<T>(
-    id: string,
-    include: RepositoryCollections[],
-    session?: IDocumentSession,
-  ) {
-    return this.maybeFail(async () => {
-      const builder = include.reduce(
-        (acc, collection) => acc.include(collection),
-        session,
-      );
-      const res = builder.load(id);
-      if (!res) throw new Error();
-      return res as T;
+  /**
+   * Add unit to existing course
+   */
+  async addUnitToCourse(
+    courseId: string,
+    unit: {
+      num: number;
+      title: string;
+      exercises: { id: string; title: string }[];
+    },
+  ): Promise<Course | null> {
+    return this.withSession(async (session) => {
+      const course = (await session.load(courseId)) as Course;
+      if (!course) return null;
+
+      // Add the unit to the existing course
+      course.units.push(unit);
+
+      return course;
     });
   }
 
-  private async maybeFail<T>(action: () => Promise<T>) {
-    const maybe = {} as { result: any; founded: boolean };
-    try {
-      maybe.result = (await action()) as T;
-      maybe.founded = true;
-    } catch {
-      maybe.result = null;
-      maybe.founded = false;
-    } finally {
-      return maybe;
-    }
-  }
+  /**
+   * Add exercise to unit in course
+   */
+  async addExerciseToUnit(
+    courseId: string,
+    unitNum: number,
+    exercise: { id: string; title: string },
+  ): Promise<Course | null> {
+    return this.withSession(async (session) => {
+      const course = (await session.load(courseId)) as Course;
+      if (!course) return null;
 
-  async createDocument<T>(
-    collection: RepositoryCollections,
-    document: T,
-    session?: IDocumentSession,
-  ) {
-    const setup = (obj: any) => {
-      return { ...obj, '@metadata': { '@collection': collection } };
-    };
-    const id = crypto.randomUUID();
+      const unitIndex = course.units.findIndex((unit) => unit.num === unitNum);
+      if (unitIndex === -1) return null;
 
-    await session.store(setup(document), id);
-    return { ...document, id };
-  }
+      // Add exercise to the unit
+      course.units[unitIndex].exercises.push(exercise);
 
-  async save(session?: IDocumentSession) {
-    session.saveChanges();
-    this.freeSession();
+      return course;
+    });
   }
 }
