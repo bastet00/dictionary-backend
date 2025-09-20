@@ -12,22 +12,6 @@ export class CourseService {
     private exerciseRepository: ExerciseRepository,
   ) {}
 
-  private toDocument(createCourseDto: CreateCourseDto): Omit<Course, 'id'> {
-    const course = {
-      title: createCourseDto.title,
-      level: createCourseDto.level,
-      units: [],
-    };
-    const unit = {
-      num: createCourseDto.unit.num,
-      title: createCourseDto.unit.title,
-      exercises: [],
-    } as CourseUnit;
-
-    course.units.push(unit);
-    return course as Omit<Course, 'id'>;
-  }
-
   async createCourse(createCourseDto: CreateCourseDto): Promise<Course> {
     const existingCourse = await this.courseRepository.findByLevel(
       createCourseDto.level,
@@ -36,9 +20,7 @@ export class CourseService {
 
     if (!existingCourse) {
       // Create new course
-      return this.courseRepository.withSession(async (session) => {
-        return this.courseRepository.create(newCourseData, session);
-      });
+      return this.courseRepository.create(newCourseData);
     }
 
     // Check if unit already exists
@@ -100,5 +82,21 @@ export class CourseService {
     }
 
     return updatedCourse;
+  }
+
+  private toDocument(createCourseDto: CreateCourseDto): Omit<Course, 'id'> {
+    const course = {
+      title: createCourseDto.title,
+      level: createCourseDto.level,
+      units: [],
+    };
+    const unit = {
+      num: createCourseDto.unit.num,
+      title: createCourseDto.unit.title,
+      exercises: [],
+    } as CourseUnit;
+
+    course.units.push(unit);
+    return course as Omit<Course, 'id'>;
   }
 }

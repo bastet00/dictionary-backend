@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { QuestionRepository } from '../db/repository/question.repository';
 import { CreateQuestionDto } from '../dto/create-question.dto';
 import { Question } from '../db/documents/question.document';
@@ -21,10 +21,6 @@ export class QuestionService {
   }
 
   async getQuestions(): Promise<Question[]> {
-    const questions = await this.questionRepository.findAllByCreated();
-    if (!questions || questions.length === 0) {
-      throw new BadRequestException('no questions found');
-    }
-    return questions;
+    return await this.questionRepository.findAllByCreated();
   }
 }

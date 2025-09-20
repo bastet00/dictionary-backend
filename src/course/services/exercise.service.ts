@@ -31,9 +31,7 @@ export class ExerciseService {
       questions: [],
     };
 
-    return this.exerciseRepository.withSession(async (session) => {
-      return this.exerciseRepository.create(exerciseData, session);
-    });
+    return this.exerciseRepository.create(exerciseData);
   }
 
   async pushQuestionToExercise(eTitle: string, qid: string): Promise<Exercise> {
