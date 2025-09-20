@@ -21,10 +21,10 @@ export class ExerciseController {
 
   @Patch()
   pushQuestionToExercise(
-    @Query('exerciseTitle') eTitle: any,
+    @Query('exerciseId') exerciseId: string,
     @Query('questionId') qid: string,
   ) {
-    return this.exerciseService.pushQuestionToExercise(eTitle, qid);
+    return this.exerciseService.pushQuestionToExercise(exerciseId, qid);
   }
 
   @Get(':id')

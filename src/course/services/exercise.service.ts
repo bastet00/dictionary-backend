@@ -34,18 +34,21 @@ export class ExerciseService {
     return this.exerciseRepository.create(exerciseData);
   }
 
-  async pushQuestionToExercise(eTitle: string, qid: string): Promise<Exercise> {
+  async pushQuestionToExercise(
+    exerciseId: string,
+    qid: string,
+  ): Promise<Exercise> {
     const question = await this.questionRepository.findById(qid);
     if (!question) {
       throw new BadRequestException('question not found');
     }
 
-    const exercise = await this.loadExerciseByTitle(eTitle);
+    const exercise = await this.exerciseRepository.findById(exerciseId);
     if (!exercise) {
       throw new BadRequestException('exercise not found');
     }
 
-    return this.exerciseRepository.addQuestionToExercise(exercise.id!, qid);
+    return this.exerciseRepository.addQuestionToExercise(exerciseId, qid);
   }
 
   async getExerciseById(id: string): Promise<{
