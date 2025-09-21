@@ -11,6 +11,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { LiteralTranslationModule } from './literal-translation/literal-translation.module';
 import { TranslationModule } from './translation/translation.module';
 import { CategoryModule } from './category/category.module';
+import { CourseModule } from './course/course.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { CategoryModule } from './category/category.module';
     LiteralTranslationModule,
     TranslationModule,
     CategoryModule,
+    CourseModule,
   ],
   providers: [
     {
