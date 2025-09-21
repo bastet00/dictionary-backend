@@ -1,44 +1,43 @@
 import { SequenceAnswers } from './sequence-answers.factory';
 import { McqAnswers } from './mcq-answers.factory';
+import { QuestionType } from '../db/documents/question.document';
 
 export type QuestionAnswers = SequenceAnswers | McqAnswers;
 
-type Registers = { name: string; of: QuestionAnswers };
-
 /**
  * Handles:
- * - cast each exercise type to its appropiate class dto so class validator
+ * - cast each exercise type to its appropriate class dto so class validator
  * process the nested objects with right validators despite different keys
  *
  * - processing different exercise documents from the database checking its
  *   class and answer correctness
  * */
 export class AnswersFactory {
-  registers: Registers[];
+  private static instance: AnswersFactory;
+  private registers: Map<string, new () => QuestionAnswers>;
 
-  constructor(args?: Registers[]) {
-    this.registers = args || [];
+  private constructor() {
+    this.registers = new Map();
+    this.initialize();
   }
 
-  initialize() {
-    const mcq = new McqAnswers();
-    const seq = new SequenceAnswers();
-    this.registers.push({
-      name: mcq.typeName(),
-      of: mcq,
-    });
-    this.registers.push({
-      name: seq.typeName(),
-      of: seq,
-    });
-
-    return new AnswersFactory(this.registers);
-  }
-
-  factorize(type: string) {
-    for (const register of this.registers) {
-      if (register.name === type) return register.of;
+  static getInstance(): AnswersFactory {
+    if (!AnswersFactory.instance) {
+      AnswersFactory.instance = new AnswersFactory();
     }
-    return new Error();
+    return AnswersFactory.instance;
+  }
+
+  private initialize() {
+    this.registers.set(QuestionType.MCQ, McqAnswers);
+    this.registers.set(QuestionType.SEQUENCE, SequenceAnswers);
+  }
+
+  getAnswerClass(type: string): new () => QuestionAnswers {
+    const AnswerClass = this.registers.get(type);
+    if (!AnswerClass) {
+      throw new Error(`Unknown answer type: ${type}`);
+    }
+    return AnswerClass;
   }
 }

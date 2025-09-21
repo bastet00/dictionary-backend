@@ -1,12 +1,13 @@
 import {
   ArrayNotEmpty,
   IsArray,
+  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { Question } from '../db/documents/question.document';
+import { Question, QuestionType } from '../db/documents/question.document';
 import { Type, TypeHelpOptions } from 'class-transformer';
 import { AnswersFactory, QuestionAnswers } from '../factory/factory';
 import { UnprocessableEntityException } from '@nestjs/common';
@@ -23,21 +24,22 @@ export class CreateQuestionDto implements Question {
 
   @IsNotEmpty()
   @IsString()
-  type: string;
+  @IsIn(Object.values(QuestionType))
+  type: QuestionType;
 
   @IsString()
   @IsNotEmpty()
   question: string;
 
   @Type((opts: TypeHelpOptions) => {
-    const factory = new AnswersFactory().initialize();
-    const cast = factory.factorize(opts.object.type);
-    if (cast instanceof Error) {
+    try {
+      const factory = AnswersFactory.getInstance();
+      return factory.getAnswerClass(opts.object.type);
+    } catch (error) {
       throw new UnprocessableEntityException(
-        `cannot process answers of type ${opts.object.type}`,
+        `Cannot process answers of type '${opts.object.type}'.`,
       );
     }
-    return cast.constructor;
   })
   @IsArray()
   @ArrayNotEmpty()

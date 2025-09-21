@@ -4,6 +4,4 @@ export class CreateExerciseDto {
   @IsNotEmpty()
   @IsString()
   title: string;
-
-  questions: { id: string }[];
 }
