@@ -17,18 +17,14 @@ export class ExerciseRepository extends BaseRepository<Exercise> {
    * Find exercise by title
    */
   async findByTitle(title: string): Promise<Exercise | null> {
-    return this.withReadSession(async (session) => {
-      return this.findOneBy('title', title, session);
-    });
+    return this.findOneBy('title', title);
   }
 
   /**
    * Get all exercises ordered by title
    */
   async findAllByTitle(): Promise<Exercise[]> {
-    return this.withReadSession(async (session) => {
-      return this.findAll('title', 'asc', session);
-    });
+    return this.findAll('title', 'asc');
   }
 
   /**
@@ -52,29 +48,4 @@ export class ExerciseRepository extends BaseRepository<Exercise> {
   /**
    * Get exercise with populated questions
    */
-  async getExerciseWithQuestions(exerciseId: string): Promise<{
-    id: string;
-    title: string;
-    questions: any[];
-  } | null> {
-    return this.withReadSession(async (session) => {
-      const exercise = await this.findById(exerciseId, session);
-      if (!exercise) return null;
-
-      // Load all questions for this exercise
-      const questions = [];
-      for (const questionRef of exercise.questions) {
-        const question = await session.load(questionRef.id);
-        if (question) {
-          questions.push(question);
-        }
-      }
-
-      return {
-        id: exercise.id!,
-        title: exercise.title,
-        questions: questions,
-      };
-    });
-  }
 }

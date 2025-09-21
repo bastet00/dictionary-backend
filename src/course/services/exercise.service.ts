@@ -55,10 +55,24 @@ export class ExerciseService {
     title: string;
     questions: Question[];
   }> {
-    const result = await this.exerciseRepository.getExerciseWithQuestions(id);
-    if (!result) {
+    const exercise = await this.exerciseRepository.findById(id);
+    if (!exercise) {
       throw new BadRequestException('exercise not found');
     }
-    return result;
+
+    // Load all questions for this exercise
+    const questions: Question[] = [];
+    for (const questionRef of exercise.questions) {
+      const question = await this.questionRepository.findById(questionRef.id);
+      if (question) {
+        questions.push(question);
+      }
+    }
+
+    return {
+      id: exercise.id!,
+      title: exercise.title,
+      questions: questions,
+    };
   }
 }

@@ -41,9 +41,7 @@ export class QuestionRepository extends BaseRepository<Question> {
    * Get all questions ordered by creation date
    */
   async findAllByCreated(): Promise<Question[]> {
-    return this.withReadSession(async (session) => {
-      return this.findAll('created', 'desc', session);
-    });
+    return this.findAll('created', 'desc');
   }
 
   /**

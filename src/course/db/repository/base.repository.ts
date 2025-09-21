@@ -44,33 +44,31 @@ export abstract class BaseRepository<T extends BaseEntity> {
   /**
    * Find by ID
    */
-  async findById(id: string, session?: IDocumentSession): Promise<T | null> {
-    const sessionToUse = session || this.ravenService.session();
-    try {
-      const result = await sessionToUse.load(id);
-      return (result as T) || null;
-    } catch {
-      return null;
-    }
+  async findById(id: string): Promise<T | null> {
+    return this.withReadSession(async (session) => {
+      try {
+        const result = await session.load(id);
+        return (result as T) || null;
+      } catch {
+        return null;
+      }
+    });
   }
 
   /**
    * Find one by field
    */
-  async findOneBy(
-    field: keyof T,
-    value: any,
-    session?: IDocumentSession,
-  ): Promise<T | null> {
-    const sessionToUse = session || this.ravenService.session();
-    try {
-      const result = await this.query(sessionToUse)
-        .whereEquals(field as string, value)
-        .single();
-      return (result as T) || null;
-    } catch {
-      return null;
-    }
+  async findOneBy(field: keyof T, value: any): Promise<T | null> {
+    return this.withReadSession(async (session) => {
+      try {
+        const result = await this.query(session)
+          .whereEquals(field as string, value)
+          .single();
+        return (result as T) || null;
+      } catch {
+        return null;
+      }
+    });
   }
 
   /**
@@ -79,19 +77,19 @@ export abstract class BaseRepository<T extends BaseEntity> {
   async findAll(
     orderBy?: keyof T,
     order: 'asc' | 'desc' = 'desc',
-    session?: IDocumentSession,
   ): Promise<T[]> {
-    const sessionToUse = session || this.ravenService.session();
-    let query = this.query(sessionToUse);
+    return this.withReadSession(async (session) => {
+      let query = this.query(session);
 
-    if (orderBy) {
-      query =
-        order === 'desc'
-          ? query.orderByDescending(orderBy as string)
-          : query.orderBy(orderBy as string);
-    }
+      if (orderBy) {
+        query =
+          order === 'desc'
+            ? query.orderByDescending(orderBy as string)
+            : query.orderBy(orderBy as string);
+      }
 
-    return (await query.all()) as T[];
+      return (await query.all()) as T[];
+    });
   }
 
   /**

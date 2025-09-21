@@ -17,27 +17,21 @@ export class CourseRepository extends BaseRepository<Course> {
    * Find course by level
    */
   async findByLevel(level: number): Promise<Course | null> {
-    return this.withReadSession(async (session) => {
-      return this.findOneBy('level', level, session);
-    });
+    return this.findOneBy('level', level);
   }
 
   /**
    * Find course by title
    */
   async findByTitle(title: string): Promise<Course | null> {
-    return this.withReadSession(async (session) => {
-      return this.findOneBy('title', title, session);
-    });
+    return this.findOneBy('title', title);
   }
 
   /**
    * Get all courses ordered by level
    */
   async findAllByLevel(): Promise<Course[]> {
-    return this.withReadSession(async (session) => {
-      return this.findAll('level', 'asc', session);
-    });
+    return this.findAll('level', 'asc');
   }
 
   /**
