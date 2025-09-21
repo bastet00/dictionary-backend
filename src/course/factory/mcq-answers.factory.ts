@@ -1,5 +1,6 @@
 import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 import { AnswersABC } from './answers.abs';
+import { QuestionType } from '../db/documents/question.document';
 
 export class McqAnswers implements AnswersABC {
   @IsBoolean()
@@ -10,6 +11,6 @@ export class McqAnswers implements AnswersABC {
 
   aid: number;
   typeName(): string {
-    return 'mcq';
+    return QuestionType.MCQ;
   }
 }
