@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { RavendbService } from 'src/raven/raven.service';
 import { IDocumentSession, IDocumentQuery } from 'ravendb';
 
@@ -49,8 +53,33 @@ export abstract class BaseRepository<T extends BaseEntity> {
       try {
         const result = await session.load(id);
         return (result as T) || null;
-      } catch {
+      } catch (error) {
+        console.error(
+          `Failed to load entity with id ${id}: for document type ${this.getCollectionName()}`,
+          error,
+        );
         return null;
+      }
+    });
+  }
+
+  /**
+   * Find by ID (throws exception if not found)
+   */
+  async findByIdOrFail(id: string): Promise<T> {
+    return this.withReadSession(async (session) => {
+      try {
+        const result = await session.load(id);
+        if (!result) {
+          throw new NotFoundException(`Entity with id ${id} not found`);
+        }
+        return result as T;
+      } catch (error) {
+        if (error instanceof NotFoundException) {
+          throw error;
+        }
+        console.error(`Database error loading entity with id ${id}:`, error);
+        throw new InternalServerErrorException('Failed to load entity');
       }
     });
   }
@@ -65,7 +94,11 @@ export abstract class BaseRepository<T extends BaseEntity> {
           .whereEquals(field as string, value)
           .single();
         return (result as T) || null;
-      } catch {
+      } catch (error) {
+        console.error(
+          `Failed to load entity with field ${field as string}, value ${value}: for document type ${this.getCollectionName()}`,
+          error,
+        );
         return null;
       }
     });
@@ -136,7 +169,8 @@ export abstract class BaseRepository<T extends BaseEntity> {
     try {
       sessionToUse.delete(id);
       return true;
-    } catch {
+    } catch (error) {
+      console.error(`Failed to delete entity with id ${id}:`, error);
       return false;
     }
   }
