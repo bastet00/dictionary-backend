@@ -1,62 +1,108 @@
 import { Injectable } from '@nestjs/common';
-import { LanguageEnum } from 'src/dto/language.enum';
-import { WordService } from 'src/word/word.service';
+import { LanguageEnum } from '../dto/language.enum';
+import { WordService } from '../word/word.service';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { Word } from 'src/raven/entities/word.entity';
+import { SentenceService } from './sentence.service';
+import { Sentence } from '../raven/entities/sentence.entity';
+import { Word, WordValue } from '../raven/entities/word.entity';
 
 @Injectable()
 export class TranslationService {
-  constructor(private readonly wordService: WordService) {}
+  constructor(
+    private readonly wordService: WordService,
+    private readonly sentenceService: SentenceService,
+  ) {}
 
   async translate(language: LanguageEnum, text: string) {
     const lang = this.wordService.languageSecretSwitch(text, language);
-    const dbResult = await this.wordService.searchAndSuggest(lang, text);
+    const sentences = await this.sentenceService.vectorSimilaritySearch(
+      lang,
+      text,
+    );
+    const words = await this.wordService.vectorSimilaritySearch(lang, text);
+    const { system, contextLearning, question } = this.preparePrompt(
+      sentences,
+      words,
+      lang,
+      text,
+    );
+    const prompt = system + contextLearning + question;
 
-    const prompt = this.preparePrompt(dbResult, lang, text);
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }); // reaplce model name
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const result = await model.generateContent([prompt]);
     console.log(prompt);
-    console.log(model);
+    console.log(result.response.text());
+
+    return {
+      prompt: prompt,
+      googleResponse: result.response.text(),
+    };
   }
 
-  private preparePrompt(dbResult: Word[], lang: LanguageEnum, text: string) {
-    let prompt = '';
-    prompt += this.getPromptHeader();
-    // TODO: handle arguments
-    prompt += this.getPromptFooter(text);
-    this.handleDifferentPromptArgs(dbResult, lang);
+  private preparePrompt(
+    sentences: Sentence[],
+    words: Word[],
+    lang: LanguageEnum,
+    text: string,
+  ) {
+    const prompt = {
+      system: this.getSystemPrompt(),
+      contextLearning: this.getContextLearningPrompt(sentences, words, lang),
+      question: this.getQuestionPrompt(text),
+    };
     return prompt;
   }
 
-  private getPromptHeader(): string {
+  private getSystemPrompt(): string {
     return `You are an Egyptologist translating English to ancient Egyptian.
             Use the following translations as a reference (template: [word -> transiliteriation determinative]):
     `;
   }
 
-  private getPromptFooter(text: string): string {
+  private getQuestionPrompt(text: string): string {
     return `
-    Example Format:
-      - Ra on the front of: ra 𓇳 nxt 𓀜
-      - my name is amro -> rni Amro 𓀁
     Provide final result of translation with translation tag.
+    Answer only with the translation.
+    If you were not provided vocabulary, answer with: "No translation found".
     Translate the following sentence to ancient Egyptian: ${text}.
     `;
   }
 
-  private handleDifferentPromptArgs(
-    dbResult: Word[],
-    queryLangauge: LanguageEnum,
-  ) {
-    console.log(dbResult, queryLangauge);
-    const customizePrompt = `
-      - x1 from query -> x1 value from db +  𓀁
-      - x2 from query -> x2 value from db + symbol
-      - and so on
-      - (suffix prn.) I , me , my -> i𓀁
-      - I -> ink 𓀁
-      - home -> pr 𓉐
-`;
-    return customizePrompt;
+  private getContextLearningPrompt(
+    sentences: Sentence[],
+    words: Word[],
+    queryLanguage: LanguageEnum,
+  ): string {
+    return (
+      sentences
+        .map((sentence: Sentence) => {
+          return `- ${sentence[queryLanguage]} -> ${sentence.transliteration}\n`;
+        })
+        .join('\n') +
+      words
+        .map((word: Word) => {
+          return `- ${word[queryLanguage].map((wordValue: WordValue) => wordValue.word).join(',')} -> ${word.egyptian[0].transliteration}\n`;
+        })
+        .join('\n')
+    );
   }
+
+  // word
+  // private handleDifferentPromptArgs(
+  //   dbResult: Word[],
+  //   queryLangauge: LanguageEnum,
+  // ) {
+  //   const customizePrompt = dbResult
+  //     .map((word) => {
+  //       const egy = word.egyptian;
+  //       const targetLanguage = word[queryLangauge] as { word: string }[];
+  //       const unicode = egy[0].symbol;
+  //       const symbol = String.fromCodePoint(parseInt(unicode, 16));
+  //       return `- ${targetLanguage[0].word} -> ${egy[0].word} ${symbol}\n`;
+  //     })
+  //     .join('\n');
+  //   return customizePrompt;
+  // }
+  //
 }

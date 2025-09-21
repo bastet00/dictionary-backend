@@ -1,16 +1,18 @@
 import { CategoryEnum } from 'src/category/dto/category.enum';
 
+export type WordValue = { word: string };
+
 export interface Word {
   id: string;
   resources?: string[];
-  arabic: { word: string }[];
+  arabic: WordValue[];
   egyptian: {
     word: string;
     symbol: string;
     transliteration: string;
     hieroglyphics: string[];
   }[];
-  english: { word: string }[];
+  english: WordValue[];
   category?: CategoryEnum[];
   createdAt?: string;
   updatedAt?: string;
