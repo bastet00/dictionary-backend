@@ -30,8 +30,7 @@ export class ExerciseService {
       title: createExerciseDto.title,
       questions: [],
     };
-
-    return this.exerciseRepository.create(exerciseData);
+    return this.exerciseRepository.createAndSave(exerciseData);
   }
 
   async pushQuestionToExercise(

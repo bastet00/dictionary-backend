@@ -20,7 +20,7 @@ export class CourseService {
 
     if (!existingCourse) {
       // Create new course
-      return this.courseRepository.create(newCourseData);
+      return this.courseRepository.createAndSave(newCourseData);
     }
 
     // Check if unit already exists

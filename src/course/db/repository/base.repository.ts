@@ -42,28 +42,6 @@ export abstract class BaseRepository<T extends BaseEntity> {
   }
 
   /**
-   * Create a new document
-   * Following RavenDB best practices:
-   * - Use session.Store() to add entity to session's internal map
-   * - Let session track changes automatically
-   * - Don't call saveChanges() automatically (let caller decide when to save)
-   */
-  async create(entity: Omit<T, 'id'>, session?: IDocumentSession): Promise<T> {
-    const sessionToUse = session || this.ravenService.session();
-    const id = crypto.randomUUID();
-
-    // Create the entity with ID
-    const entityWithId = { ...entity, id } as T;
-
-    // Store in session - this adds to session's internal map and enables change tracking
-    await sessionToUse.store(entityWithId, id, {
-      documentType: this.getCollectionName(),
-    });
-
-    return entityWithId;
-  }
-
-  /**
    * Find by ID
    */
   async findById(id: string, session?: IDocumentSession): Promise<T | null> {
@@ -117,13 +95,44 @@ export abstract class BaseRepository<T extends BaseEntity> {
   }
 
   /**
+   * Create a new document
+   * Following RavenDB best practices:
+   * - Use session.Store() to add entity to session's internal map
+   * - Let session track changes automatically
+   * - Don't call saveChanges() automatically (let caller decide when to save)
+   */
+  async create(entity: Omit<T, 'id'>, session: IDocumentSession): Promise<T> {
+    const sessionToUse = session;
+    const id = crypto.randomUUID();
+
+    // Create the entity with ID
+    const entityWithId = { ...entity, id } as T;
+
+    // Store in session - this adds to session's internal map and enables change tracking
+    sessionToUse.store(entityWithId, id, {
+      documentType: this.getCollectionName(),
+    });
+
+    return entityWithId;
+  }
+
+  /**
+   * Create and save a new document (convenience method)
+   * For simple cases where you don't need transaction control
+   */
+  async createAndSave(entity: Omit<T, 'id'>): Promise<T> {
+    return this.withSession(async (session) => {
+      return this.create(entity, session);
+    });
+  }
+
+  /**
    * Delete an entity
    */
-  async delete(id: string, session?: IDocumentSession): Promise<boolean> {
-    const sessionToUse = session || this.ravenService.session();
+  async delete(id: string, session: IDocumentSession): Promise<boolean> {
+    const sessionToUse = session;
     try {
       sessionToUse.delete(id);
-      sessionToUse.saveChanges();
       return true;
     } catch {
       return false;
