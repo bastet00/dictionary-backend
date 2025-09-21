@@ -60,14 +60,9 @@ export class ExerciseService {
       throw new BadRequestException('exercise not found');
     }
 
-    // Load all questions for this exercise
-    const questions: Question[] = [];
-    for (const questionRef of exercise.questions) {
-      const question = await this.questionRepository.findById(questionRef.id);
-      if (question) {
-        questions.push(question);
-      }
-    }
+    // Load all questions for this exercise in a single batch
+    const questionIds = exercise.questions.map(q => q.id);
+    const questions: Question[] = await this.questionRepository.findByIds(questionIds);
 
     return {
       id: exercise.id!,
