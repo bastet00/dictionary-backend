@@ -61,13 +61,14 @@ export class ExerciseService {
     }
 
     // Load all questions for this exercise in a single batch
-    const questionIds = exercise.questions.map(q => q.id);
-    const questions: Question[] = await this.questionRepository.findByIds(questionIds);
+    const questionIds = exercise.questions.map((q) => q.id);
+    const questions: Question[] =
+      await this.questionRepository.findByIds(questionIds);
 
     return {
       id: exercise.id!,
       title: exercise.title,
-      questions: questions,
+      questions: await questions,
     };
   }
 }

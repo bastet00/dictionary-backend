@@ -28,6 +28,17 @@ export class QuestionRepository extends BaseRepository<Question> {
   /**
    * Find questions by tags
    */
+  async findByIds(ids: string[]): Promise<Question[]> {
+    return this.withReadSession(async (session) => {
+      return this.query(session).whereIn('id', ids).all() as Promise<
+        Question[]
+      >;
+    });
+  }
+
+  /**
+   * Find questions by tags
+   */
   async findByTags(tags: string[]): Promise<Question[]> {
     return this.withReadSession(async (session) => {
       return this.query(session)
