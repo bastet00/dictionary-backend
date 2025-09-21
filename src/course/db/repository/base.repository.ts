@@ -105,8 +105,12 @@ export abstract class BaseRepository<T extends BaseEntity> {
     const sessionToUse = session;
     const id = crypto.randomUUID();
 
-    // Create the entity with ID
-    const entityWithId = { ...entity, id } as T;
+    // Create the entity with ID and metadata
+    const entityWithId = {
+      ...entity,
+      id,
+      '@metadata': { '@collection': this.getCollectionName() },
+    } as T;
 
     // Store in session - this adds to session's internal map and enables change tracking
     sessionToUse.store(entityWithId, id, {
