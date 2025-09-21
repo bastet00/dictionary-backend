@@ -68,7 +68,7 @@ export class ExerciseService {
     return {
       id: exercise.id!,
       title: exercise.title,
-      questions: await questions,
+      questions: questions,
     };
   }
 }
