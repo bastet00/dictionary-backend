@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { RavendbService } from '../raven/raven.service';
 import { LanguageEnum } from '../dto/language.enum';
 import {
@@ -76,10 +80,29 @@ export class WordService {
     lang: LanguageEnum = LanguageEnum.english,
     text: string,
   ): Promise<Word[]> {
-    const words = await this.ravendbService.queryViaHttp<Word[]>(
-      `from word where vector.search(embedding.text(${lang}.word), '${text}', 0.80, 512) limit 10`,
-    );
-    return this.toDto(words);
+    const session = this.ravendbService.session();
+    try {
+      const words = await session
+        .query<Word>({ collection: 'word' })
+        .vectorSearch(
+          (field) => field.withText(`${lang}.word`),
+          (factory) => factory.byText(text),
+          {
+            similarity: 0.8,
+            numberOfCandidates: 512,
+          },
+        )
+        .take(10)
+        .all();
+
+      return this.toDto(words);
+    } catch (error) {
+      console.error('Vector search failed:', error);
+      throw new InternalServerErrorException('Search failed');
+      // return this.search(lang, text);
+    } finally {
+      session.dispose();
+    }
   }
 
   async search(lang: LanguageEnum, word: string): Promise<Word[]> {

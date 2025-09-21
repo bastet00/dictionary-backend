@@ -27,12 +27,11 @@ export class TranslationService {
       text,
     );
     const prompt = system + contextLearning + question;
+    console.log(prompt);
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' });
     const result = await model.generateContent([prompt]);
-    console.log(prompt);
-    console.log(result.response.text());
 
     return {
       prompt: prompt,
