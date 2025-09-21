@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { RavendbService } from 'src/raven/raven.service';
 import { IDocumentSession, IDocumentQuery } from 'ravendb';
+import { randomUUID } from 'crypto';
 
 export interface BaseEntity {
   id?: string;
@@ -134,7 +135,7 @@ export abstract class BaseRepository<T extends BaseEntity> {
    */
   async create(entity: Omit<T, 'id'>, session: IDocumentSession): Promise<T> {
     const sessionToUse = session;
-    const id = crypto.randomUUID();
+    const id = randomUUID();
 
     // Create the entity with ID and metadata
     const entityWithId = {

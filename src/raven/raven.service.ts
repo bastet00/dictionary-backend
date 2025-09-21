@@ -4,6 +4,7 @@ import { DocumentStore } from 'ravendb';
 import * as fs from 'fs';
 import { firstValueFrom } from 'rxjs';
 import * as https from 'https';
+import { randomUUID } from 'crypto';
 
 export type DocumentName = 'word' | 'sentence' | 'word-suggestion' | 'Example';
 @Injectable()
@@ -38,7 +39,7 @@ export class RavendbService {
 
     await db.store(
       { ...payload, '@metadata': { '@collection': docName } },
-      crypto.randomUUID(),
+      randomUUID(),
       { documentType: docName },
     );
 
