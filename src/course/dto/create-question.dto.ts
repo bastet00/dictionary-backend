@@ -12,11 +12,9 @@ import { Type, TypeHelpOptions } from 'class-transformer';
 import { AnswersFactory, QuestionAnswers } from '../factory/factory';
 import { UnprocessableEntityException } from '@nestjs/common';
 
-export class CreateQuestionDto implements Question {
-  id: string;
-  created: Date;
-  updated: Date;
-
+export class CreateQuestionDto
+  implements Omit<Question, 'id' | 'created' | 'updated'>
+{
   @IsOptional()
   @IsArray()
   @ArrayNotEmpty()
