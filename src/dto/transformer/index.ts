@@ -1,2 +1,2 @@
 export * from './to-hieroglyphics-sing';
-export * from './to-unicode';
+export * from './to-unicode/to-unicode';

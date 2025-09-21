@@ -27,7 +27,7 @@ export class LiteralTranslationController {
       'lang',
       new ParseEnumPipe(LiteralTransLanguageEnum, { optional: true }),
     )
-    lang: LiteralTransLanguageEnum = LiteralTransLanguageEnum.ARABIC,
+    lang: LiteralTransLanguageEnum = LiteralTransLanguageEnum.arabic,
   ): LiteralTranslationResultsDto {
     return this.literalTranslationService.getLiteralTranslation(text, {
       useMultiLetterSymbols,

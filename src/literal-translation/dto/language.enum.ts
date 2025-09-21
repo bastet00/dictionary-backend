@@ -1,4 +1,5 @@
 export enum LiteralTransLanguageEnum {
-  ARABIC = 'arabic',
-  HIEROGLYPHICS = 'hieroglyphics',
+  arabic = 'arabic',
+  egyptian = 'egyptian',
+  english = 'english',
 }

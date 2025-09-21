@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CreateWordDto } from 'src/dto/input/word/create-word.dto';
-import { RavendbService } from 'src/raven/raven.service';
+import { RavendbService } from '../../raven/raven.service';
 import { UpdateWordDto } from './dto/update-word.dto';
+import { fromTransliterationToEgyptian } from 'src/dto/transformer/to-egyptian/from-transliteration-to-egyptian';
+import { Word } from 'src/raven/entities/word.entity';
 
 @Injectable()
 export class AdminWordService {
@@ -22,7 +24,7 @@ export class AdminWordService {
     const total = await this.query(skip, lang, word).count();
     const totalPages = Math.ceil(total / perPage);
     const res = await this.query(skip, lang, word)
-      .selectFields(['id', 'arabic', 'english', 'egyptian'])
+      .selectFields(['id', 'arabic', 'english', 'egyptian', 'category'])
       .take(perPage)
       .orderByScore()
       .all();
@@ -36,6 +38,15 @@ export class AdminWordService {
     };
   }
 
+  create(createWordDto: CreateWordDto) {
+    createWordDto = this.addWordToEgyptianDto(createWordDto);
+    const timeNow = new Date().toISOString();
+    return this.ravendbService.saveToDb(
+      { ...createWordDto, createdAt: timeNow, updatedAt: timeNow },
+      'word',
+    );
+  }
+
   async delete(id: string) {
     const session = this.ravendbService.session();
     await session.delete(id);
@@ -44,12 +55,28 @@ export class AdminWordService {
 
   async patch(id: string, updateWordDto: UpdateWordDto) {
     const session = this.ravendbService.session();
-    const doc = (await session.load(id)) as CreateWordDto;
+    const doc = (await session.load(id)) as Word;
     doc.egyptian[0].word = updateWordDto.egyptian[0].word;
     doc.egyptian[0].symbol = updateWordDto.egyptian[0].symbol;
     doc.arabic = updateWordDto.arabic;
     doc.english = updateWordDto.english ? updateWordDto.english : doc.english;
+    doc.category = updateWordDto.category
+      ? updateWordDto.category
+      : doc.category;
+
+    doc.updatedAt = new Date().toISOString();
     await session.saveChanges();
     return doc;
+  }
+
+  private addWordToEgyptianDto(createWordDto: CreateWordDto) {
+    for (const egyptian of createWordDto.egyptian) {
+      if (!egyptian.word && egyptian.transliteration) {
+        egyptian.word = fromTransliterationToEgyptian({
+          value: egyptian.transliteration,
+        });
+      }
+    }
+    return createWordDto;
   }
 }

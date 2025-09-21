@@ -3,6 +3,7 @@ import {
   ArrayMaxSize,
   ArrayMinSize,
   IsArray,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -10,7 +11,8 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
-import { toUTF32String } from '../../transformer/to-unicode';
+import { toUTF32String } from '../../transformer/to-unicode/to-unicode';
+import { CategoryEnum } from 'src/category/dto/category.enum';
 
 export class WordDto {
   @IsNotEmpty()
@@ -19,13 +21,12 @@ export class WordDto {
 }
 
 export class EgyptianWordDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MaxLength(500)
   word: string;
 
   @IsString()
-  @IsOptional()
   @MaxLength(500)
   transliteration: string;
 
@@ -75,6 +76,10 @@ export class CreateWordDto {
   @Type(() => EgyptianWordDto)
   @ValidateNested({ each: true })
   egyptian: EgyptianWordDto[];
+
+  @IsArray()
+  @IsEnum(CategoryEnum, { each: true })
+  category: CategoryEnum[] = [];
 }
 
 export class BulkCreateWordDto {

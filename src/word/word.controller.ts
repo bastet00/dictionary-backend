@@ -1,21 +1,15 @@
 import {
-  Body,
   ClassSerializerInterceptor,
   Controller,
   Get,
   Param,
   ParseEnumPipe,
   ParseUUIDPipe,
-  Post,
   Query,
   UseInterceptors,
 } from '@nestjs/common';
 import { WordService } from './word.service';
 import { LanguageEnum } from '../dto/language.enum';
-import {
-  BulkCreateWordDto,
-  CreateWordDto,
-} from '../dto/input/word/create-word.dto';
 import { SanitizeSpecialCharsPipe } from 'src/common/custom-pipes/sanitizeSymbolPipe';
 
 @UseInterceptors(ClassSerializerInterceptor)
@@ -63,15 +57,5 @@ export class WordController {
   @Get(':id')
   getOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.wordService.getOne(id);
-  }
-
-  @Post()
-  create(@Body() createWordDto: CreateWordDto) {
-    return this.wordService.create(createWordDto);
-  }
-
-  @Post('bulk')
-  createBulk(@Body() createWordDto: BulkCreateWordDto) {
-    return this.wordService.createBulk(createWordDto);
   }
 }

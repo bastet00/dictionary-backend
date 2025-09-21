@@ -7,6 +7,12 @@ import {
 import { GenderEnum, HieroglyphicsEnum } from './dto/gender.enum';
 import { LiteralTransLanguageEnum } from './dto/language.enum';
 import { hieroglyphicsToArabic } from './mappers/heiroglyphicsToArabic';
+import { englishToHieroglyphics } from './mappers/englishToHieroglyphics';
+
+const letterToHieroglyphics = {
+  ...arabicToHieroglyphics,
+  ...englishToHieroglyphics,
+};
 
 @Injectable()
 export class LiteralTranslationService {
@@ -27,6 +33,7 @@ export class LiteralTranslationService {
       lang?: LiteralTransLanguageEnum;
     } = {},
   ): LiteralTranslationResultsDto {
+    text = text.toLowerCase();
     const { useMultiLetterSymbols, gender, lang } = options;
 
     if (!text) {
@@ -60,9 +67,11 @@ export class LiteralTranslationService {
   ) {
     const maxPrefixRange = 3;
     switch (lang) {
-      case LiteralTransLanguageEnum.HIEROGLYPHICS:
+      case LiteralTransLanguageEnum.egyptian:
         return maxPrefixRange;
-      case LiteralTransLanguageEnum.ARABIC:
+      case LiteralTransLanguageEnum.arabic:
+        return multiLetter ? maxPrefixRange : 1;
+      case LiteralTransLanguageEnum.english:
         return multiLetter ? maxPrefixRange : 1;
     }
   }
@@ -78,8 +87,9 @@ export class LiteralTranslationService {
     let start = 0;
     let end = prefixRange;
     const literalTranslationMapper =
-      lang === LiteralTransLanguageEnum.ARABIC
-        ? arabicToHieroglyphics
+      lang === LiteralTransLanguageEnum.arabic ||
+      lang === LiteralTransLanguageEnum.english
+        ? letterToHieroglyphics
         : hieroglyphicsToArabic;
     while (start < end) {
       const prefix = text.slice(start, end);

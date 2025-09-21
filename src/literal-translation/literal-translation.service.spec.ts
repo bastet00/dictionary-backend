@@ -22,7 +22,7 @@ describe('LiteralTranslationService', () => {
     const expectedTranslation = ''; // Assuming these are the correct hieroglyphics
     expect(
       service.getLiteralTranslation(text, {
-        lang: LiteralTransLanguageEnum.ARABIC,
+        lang: LiteralTransLanguageEnum.arabic,
       }).literalTranslation,
     ).toBe(expectedTranslation);
   });
@@ -32,7 +32,7 @@ describe('LiteralTranslationService', () => {
     const expectedTranslation = ''; // Assuming these are the correct hieroglyphics
     expect(
       service.getLiteralTranslation(text, {
-        lang: LiteralTransLanguageEnum.HIEROGLYPHICS,
+        lang: LiteralTransLanguageEnum.egyptian,
       }).literalTranslation,
     ).toBe(expectedTranslation);
   });
@@ -42,7 +42,7 @@ describe('LiteralTranslationService', () => {
     const expectedTranslation = '𓋴𓃭𓄿𓅓'; // Assuming these are the correct hieroglyphics
     expect(
       service.getLiteralTranslation(text, {
-        lang: LiteralTransLanguageEnum.ARABIC,
+        lang: LiteralTransLanguageEnum.arabic,
       }).literalTranslation,
     ).toBe(expectedTranslation);
   });
@@ -52,7 +52,7 @@ describe('LiteralTranslationService', () => {
     const expectedTranslation = '𓂝𓅓𓂋𓅱'; // Assuming these are the correct hieroglyphics
     expect(
       service.getLiteralTranslation(text, {
-        lang: LiteralTransLanguageEnum.ARABIC,
+        lang: LiteralTransLanguageEnum.arabic,
       }).literalTranslation,
     ).toBe(expectedTranslation);
   });
@@ -63,7 +63,7 @@ describe('LiteralTranslationService', () => {
     expect(
       service.getLiteralTranslation(text, {
         gender: GenderEnum.MALE,
-        lang: LiteralTransLanguageEnum.ARABIC,
+        lang: LiteralTransLanguageEnum.arabic,
       }).literalTranslation,
     ).toBe(expectedTranslation);
   });
@@ -75,24 +75,24 @@ describe('LiteralTranslationService', () => {
       service.getLiteralTranslation(text, {
         useMultiLetterSymbols: true,
         gender: GenderEnum.FEMALE,
-        lang: LiteralTransLanguageEnum.ARABIC,
+        lang: LiteralTransLanguageEnum.arabic,
       }).literalTranslation,
     ).toBe(expectedTranslation);
   });
 
   it('should return the same text if no translation is found', () => {
-    const text = 'hello';
+    const text = '你好';
     expect(
       service.getLiteralTranslation(text, {
-        lang: LiteralTransLanguageEnum.ARABIC,
+        lang: LiteralTransLanguageEnum.arabic,
       }).literalTranslation,
-    ).toBe(text);
+    ).toBe('你好');
   });
 
   it('should return charachtersMapper with the same length as the text', () => {
     const text = 'سلام';
     const charachtersMapper = service.getLiteralTranslation(text, {
-      lang: LiteralTransLanguageEnum.ARABIC,
+      lang: LiteralTransLanguageEnum.arabic,
     }).lettersMapper;
     expect(charachtersMapper.length).toBe(text.length);
   });
@@ -100,7 +100,7 @@ describe('LiteralTranslationService', () => {
   it('should return charachtersMapper with array contains letters  and hieroglyphics', () => {
     const text = 'سلام';
     const charachtersMapper = service.getLiteralTranslation(text, {
-      lang: LiteralTransLanguageEnum.ARABIC,
+      lang: LiteralTransLanguageEnum.arabic,
     }).lettersMapper;
     expect(charachtersMapper[0].alphabetLetters).toBe('س');
     expect(charachtersMapper[1].alphabetLetters).toBe('ل');
@@ -117,7 +117,7 @@ describe('LiteralTranslationService', () => {
     const text = 'نفرتيتي';
     const charachtersMapper = service.getLiteralTranslation(
       text,
-      { useMultiLetterSymbols: true, lang: LiteralTransLanguageEnum.ARABIC }, // enable multi-sound query
+      { useMultiLetterSymbols: true, lang: LiteralTransLanguageEnum.arabic }, // enable multi-sound query
     ).lettersMapper;
     expect(charachtersMapper[0].alphabetLetters).toBe('نفر');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓄤');
@@ -127,7 +127,7 @@ describe('LiteralTranslationService', () => {
     const text = 'عنخ';
     const charachtersMapper = service.getLiteralTranslation(text, {
       useMultiLetterSymbols: true,
-      lang: LiteralTransLanguageEnum.ARABIC,
+      lang: LiteralTransLanguageEnum.arabic,
     }).lettersMapper;
     expect(charachtersMapper[0].alphabetLetters).toBe('عنخ');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓋹');
@@ -137,7 +137,7 @@ describe('LiteralTranslationService', () => {
     const text = 'كتابعنخ';
     const charachtersMapper = service.getLiteralTranslation(text, {
       useMultiLetterSymbols: true,
-      lang: LiteralTransLanguageEnum.ARABIC,
+      lang: LiteralTransLanguageEnum.arabic,
     }).lettersMapper;
     expect(charachtersMapper[0].alphabetLetters).toBe('ك');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓎡');
@@ -153,7 +153,7 @@ describe('LiteralTranslationService', () => {
     const text = 'نور';
     const charachtersMapper = service.getLiteralTranslation(text, {
       useMultiLetterSymbols: true,
-      lang: LiteralTransLanguageEnum.ARABIC,
+      lang: LiteralTransLanguageEnum.arabic,
     }).lettersMapper;
     expect(charachtersMapper[0].alphabetLetters).toBe('نو');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓏌');
@@ -165,7 +165,7 @@ describe('LiteralTranslationService', () => {
     const text = 'كتعنخنوكت';
     const charachtersMapper = service.getLiteralTranslation(text, {
       useMultiLetterSymbols: true,
-      lang: LiteralTransLanguageEnum.ARABIC,
+      lang: LiteralTransLanguageEnum.arabic,
     }).lettersMapper;
     expect(charachtersMapper[0].alphabetLetters).toBe('ك');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓎡');
@@ -177,11 +177,11 @@ describe('LiteralTranslationService', () => {
     expect(charachtersMapper[3].hieroglyphics).toBe('𓏌');
   });
 
-  it('should handle spaces between words', () => {
+  it('should handle spaces between words in arabic', () => {
     const text = 'نو ر';
     const charachtersMapper = service.getLiteralTranslation(text, {
       useMultiLetterSymbols: true,
-      lang: LiteralTransLanguageEnum.ARABIC,
+      lang: LiteralTransLanguageEnum.arabic,
     }).lettersMapper;
     expect(charachtersMapper[0].alphabetLetters).toBe('نو');
     expect(charachtersMapper[0].hieroglyphics).toBe('𓏌');
@@ -194,7 +194,7 @@ describe('LiteralTranslationService', () => {
     const text = '!@#$%^&*()_-';
     const charachtersMapper = service.getLiteralTranslation(text, {
       useMultiLetterSymbols: true,
-      lang: LiteralTransLanguageEnum.ARABIC,
+      lang: LiteralTransLanguageEnum.arabic,
     }).literalTranslation;
     expect(charachtersMapper).toBe(text);
   });
@@ -202,7 +202,7 @@ describe('LiteralTranslationService', () => {
   it('should translate from hiero to arabic', () => {
     const text = '𓈙𓅓𓋴 𓄿𓃭𓊃𓈖𓄿𓏏𓇌';
     const charachtersMapper = service.getLiteralTranslation(text, {
-      lang: LiteralTransLanguageEnum.HIEROGLYPHICS,
+      lang: LiteralTransLanguageEnum.egyptian,
     }).literalTranslation;
     expect(charachtersMapper).toBe('شمس ألزنأتي'); // ا -> أ
   });
@@ -211,7 +211,7 @@ describe('LiteralTranslationService', () => {
     const text = '𓇌𓅱𓋴𓆑 𓃀𓇌𓎛𓃀 𓂧𓉻𓇋𓀀';
 
     const charachtersMapper = service.getLiteralTranslation(text, {
-      lang: LiteralTransLanguageEnum.HIEROGLYPHICS,
+      lang: LiteralTransLanguageEnum.egyptian,
     });
     let spaces = 0;
     charachtersMapper.lettersMapper.forEach((obj) => {
@@ -220,5 +220,52 @@ describe('LiteralTranslationService', () => {
       }
     });
     expect(spaces).toEqual(2);
+  });
+
+  it('should handle spaces between words in english', () => {
+    const text = 'wn r';
+    const charachtersMapper = service.getLiteralTranslation(text, {
+      useMultiLetterSymbols: true,
+      lang: LiteralTransLanguageEnum.arabic,
+    }).lettersMapper;
+    expect(charachtersMapper[0].alphabetLetters).toBe('wn');
+    console.log(charachtersMapper[0].hieroglyphics);
+    expect(charachtersMapper[0].hieroglyphics).toBe('𓃹');
+    expect(charachtersMapper[1].hieroglyphics).toBe(' ');
+    expect(charachtersMapper[2].alphabetLetters).toBe('r');
+    expect(charachtersMapper[2].hieroglyphics).toBe('𓂋');
+  });
+
+  it('should translate 3 letters in english to triliteral sign', () => {
+    const text = 'ank';
+    const charachtersMapper = service.getLiteralTranslation(text, {
+      useMultiLetterSymbols: true,
+      lang: LiteralTransLanguageEnum.arabic,
+    });
+    expect(charachtersMapper.literalTranslation).toBe('𓋹');
+
+    const text2 = '3nk';
+    const charachtersMapper2 = service.getLiteralTranslation(text2, {
+      useMultiLetterSymbols: true,
+      lang: LiteralTransLanguageEnum.arabic,
+    });
+    expect(charachtersMapper2.literalTranslation).toBe('𓋹');
+  });
+  it('should translate english to hieroglyphics with single letter', () => {
+    const text = 'hello';
+    expect(
+      service.getLiteralTranslation(text, {
+        lang: LiteralTransLanguageEnum.arabic,
+      }).literalTranslation,
+    ).toBe('𓉔𓇋𓃭𓃭𓅱');
+  });
+
+  it('should translate uppercase english to hieroglyphics with single letter', () => {
+    const text = 'HeLLO';
+    expect(
+      service.getLiteralTranslation(text, {
+        lang: LiteralTransLanguageEnum.arabic,
+      }).literalTranslation,
+    ).toBe('𓉔𓇋𓃭𓃭𓅱');
   });
 });

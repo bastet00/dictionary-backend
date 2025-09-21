@@ -77,7 +77,7 @@ export class WordService {
     text: string,
   ): Promise<Word[]> {
     const words = await this.ravendbService.queryViaHttp<Word[]>(
-      `from word where vector.search(embedding.text(${lang}.word), '${text}', 0.80) limit 10`,
+      `from word where vector.search(embedding.text(${lang}.word), '${text}', 0.80, 512) limit 10`,
     );
     return this.toDto(words);
   }
@@ -118,6 +118,7 @@ export class WordService {
         arabic: word.arabic,
         egyptian: word.egyptian,
         english: word.english,
+        category: word.category,
       };
     });
   }
