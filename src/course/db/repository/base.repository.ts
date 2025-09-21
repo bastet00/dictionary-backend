@@ -43,17 +43,24 @@ export abstract class BaseRepository<T extends BaseEntity> {
 
   /**
    * Create a new document
+   * Following RavenDB best practices:
+   * - Use session.Store() to add entity to session's internal map
+   * - Let session track changes automatically
+   * - Don't call saveChanges() automatically (let caller decide when to save)
    */
   async create(entity: Omit<T, 'id'>, session?: IDocumentSession): Promise<T> {
     const sessionToUse = session || this.ravenService.session();
     const id = crypto.randomUUID();
-    const document = {
-      ...entity,
-      '@metadata': { '@collection': this.getCollectionName() },
-    };
 
-    await sessionToUse.store(document, id);
-    return { ...entity, id } as T;
+    // Create the entity with ID
+    const entityWithId = { ...entity, id } as T;
+
+    // Store in session - this adds to session's internal map and enables change tracking
+    await sessionToUse.store(entityWithId, id, {
+      documentType: this.getCollectionName(),
+    });
+
+    return entityWithId;
   }
 
   /**
@@ -110,33 +117,13 @@ export abstract class BaseRepository<T extends BaseEntity> {
   }
 
   /**
-   * Update an entity
-   */
-  async update(
-    id: string,
-    updates: Partial<T>,
-    session?: IDocumentSession,
-  ): Promise<T | null> {
-    const sessionToUse = session || this.ravenService.session();
-
-    // Load the entity to ensure it exists and is tracked by the session
-    const existing = (await sessionToUse.load(id)) as T;
-    if (!existing) return null;
-
-    // Apply updates to the loaded entity
-    Object.assign(existing, updates);
-
-    // The entity is already tracked, so we don't need to call store again
-    return existing;
-  }
-
-  /**
    * Delete an entity
    */
   async delete(id: string, session?: IDocumentSession): Promise<boolean> {
     const sessionToUse = session || this.ravenService.session();
     try {
       sessionToUse.delete(id);
+      sessionToUse.saveChanges();
       return true;
     } catch {
       return false;
